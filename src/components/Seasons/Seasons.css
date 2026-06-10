@@ -1,0 +1,125 @@
+.seasons {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  text-align: left;
+}
+
+.seasons-title {
+  margin: 0 0 14px;
+  font-size: 18px;
+  color: var(--text-h);
+}
+
+.seasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.season {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Cabecera clicable de cada temporada */
+.season-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--social-bg);
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--text-h);
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--accent-bg);
+  }
+}
+
+.season-name {
+  font-weight: 500;
+}
+
+.season-count {
+  margin-left: auto;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.season-arrow {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* Lista de episodios desplegada (AnimatedList: scroll + items animados) */
+.episodes {
+  padding: 8px;
+}
+
+.episode {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 6px;
+
+  &:hover {
+    background: var(--social-bg);
+  }
+}
+
+.episode--clickable {
+  cursor: pointer;
+}
+
+.episode-still {
+  width: 140px;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--accent-bg);
+}
+
+.episode-still--empty {
+  background: var(--accent-bg);
+}
+
+.episode-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.episode-name {
+  font-weight: 500;
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.episode-date {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.episode-overview {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.85;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.episode-loading {
+  padding: 10px;
+  font-size: 14px;
+  opacity: 0.6;
+}
