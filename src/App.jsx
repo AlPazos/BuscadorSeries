@@ -36,12 +36,13 @@ function App() {
       />
 
       <input
+        className="search-input"
         placeholder="Introduce lo que quieres buscar"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-      style={{padding:'10px', margin:'10px'}}/>
+      />
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'center', paddingTop: 16 }}>
+      <div className="cards-grid">
         {titles.map((t) => (
           <Card key={t.id} title={t} onClick={setSelected} />
         ))}

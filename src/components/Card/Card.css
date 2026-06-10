@@ -19,6 +19,21 @@
   cursor: pointer;
 }
 
+/* Móvil: dos columnas que aprovechan el ancho */
+@media (max-width: 520px) {
+  .card {
+    width: calc(50% - 8px); /* dos por fila con el gap de 16px */
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .card-plot {
+    display: none; /* en pantallas pequeñas la sinopsis satura la card */
+  }
+}
+
 .card-image {
   width: 100%;
   aspect-ratio: 2 / 3; /* misma proporción que el panel: el morph no deforma */

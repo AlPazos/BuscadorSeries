@@ -123,3 +123,24 @@
   font-size: 14px;
   opacity: 0.6;
 }
+
+/* Móvil: episodio en columna con el fotograma a lo ancho */
+@media (max-width: 600px) {
+  .episode {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .episode-still {
+    width: 100%;
+  }
+
+  .season-head {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .season-count {
+    margin-left: 0;
+  }
+}

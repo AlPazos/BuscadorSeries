@@ -80,8 +80,28 @@
 
 /* Variante para episodios: fotograma 16:9 en vez de póster 2:3 */
 .detail-image--wide {
-  width: 420px;
+  width: min(420px, 100%);
   aspect-ratio: 16 / 9;
+}
+
+/* Móvil: aprovechar la pantalla y reducir rellenos */
+@media (max-width: 600px) {
+  .detail-overlay {
+    padding: 12px;
+  }
+
+  .detail {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .detail-title {
+    font-size: 22px;
+  }
+
+  .detail-image {
+    width: min(280px, 100%);
+  }
 }
 
 .detail-image--empty {
