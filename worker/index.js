@@ -8,6 +8,14 @@ export default {
     const url = new URL(request.url)
 
     if (url.pathname.startsWith('/api/')) {
+      // distingue "el secret no está configurado" de "TMDB rechaza la key"
+      if (!env.TMDB_API_KEY) {
+        return Response.json(
+          { error: 'El secret TMDB_API_KEY no está configurado en el Worker' },
+          { status: 500 }
+        )
+      }
+
       // /api/tv/123 → https://api.themoviedb.org/3/tv/123
       const target = new URL(`${TMDB_BASE}${url.pathname.slice('/api'.length)}`)
 
@@ -21,8 +29,9 @@ export default {
         status: res.status,
         headers: {
           'Content-Type': 'application/json',
-          // cache en el edge/navegador: 5 min es de sobra para tendencias y fichas
-          'Cache-Control': 'public, max-age=300',
+          // cache en el edge/navegador: 5 min es de sobra para tendencias y fichas.
+          // Los errores no se cachean: si no, un fallo puntual se queda pegado 5 min.
+          'Cache-Control': res.ok ? 'public, max-age=300' : 'no-store',
         },
       })
     }
