@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // tercer argumento '': carga también las variables sin prefijo VITE_
@@ -8,7 +10,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    plugins: [react()],
+    plugins: [react(), cloudflare()],
     server: {
       // En desarrollo, Vite hace de proxy igual que la Pages Function en producción:
       // reenvía /api/* a TMDB añadiendo la key, que así no aparece en el navegador.
@@ -24,5 +26,5 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-  }
+  };
 })
