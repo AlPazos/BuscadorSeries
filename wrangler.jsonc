@@ -1,0 +1,16 @@
+// Configuración del Worker en Cloudflare. Al existir este archivo, el deploy
+// (npx wrangler deploy) la usa tal cual en vez de autogenerar una de solo assets.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "buscadorseries",
+  "compatibility_date": "2026-06-11",
+  "main": "worker/index.js",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  }
+}

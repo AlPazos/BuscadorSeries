@@ -1,7 +1,7 @@
 // Cliente para la API de TMDB (The Movie Database): https://developer.themoviedb.org/
 // Gratis con API key. Cubre PELÍCULAS y SERIES, con imágenes y ratings.
 // Las peticiones van a /api, un proxy que añade la key en el servidor
-// (functions/api/[[path]].js en producción, vite.config.js en desarrollo),
+// (worker/index.js en producción, vite.config.js en desarrollo),
 // para que la key nunca sea visible desde el navegador.
 const BASE_URL = "/api";
 const IMAGE_HOST = "https://image.tmdb.org/t/p";

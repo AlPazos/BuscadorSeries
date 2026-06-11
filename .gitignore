@@ -25,3 +25,7 @@ dist-ssr
 
 # variables de entorno (no subir la API key)
 .env
+.dev.vars
+
+# estado local de wrangler (Cloudflare)
+.wrangler
