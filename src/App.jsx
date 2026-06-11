@@ -50,6 +50,16 @@ function App() {
 
       {/* detalle como modal centrado */}
       {selected && <Detail title={selected} onBack={() => setSelected(null)} />}
+
+      {/* atribución requerida por los términos de uso de la API de TMDB */}
+      <footer className="tmdb-footer">
+        <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer">
+          <img className="tmdb-logo" src="/tmdbLogo.svg" alt="The Movie Database (TMDB)" />
+        </a>
+        <p>
+          Este producto usa la API de TMDB, pero no está avalado ni certificado por TMDB.
+        </p>
+      </footer>
     </>
   )
 }

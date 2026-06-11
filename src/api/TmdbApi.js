@@ -1,6 +1,9 @@
 // Cliente para la API de TMDB (The Movie Database): https://developer.themoviedb.org/
 // Gratis con API key. Cubre PELÍCULAS y SERIES, con imágenes y ratings.
-const BASE_URL = "https://api.themoviedb.org/3";
+// Las peticiones van a /api, un proxy que añade la key en el servidor
+// (functions/api/[[path]].js en producción, vite.config.js en desarrollo),
+// para que la key nunca sea visible desde el navegador.
+const BASE_URL = "/api";
 const IMAGE_HOST = "https://image.tmdb.org/t/p";
 const IMAGE_BASE = `${IMAGE_HOST}/w500`;
 
@@ -10,16 +13,13 @@ export class TmdbApi {
     return path ? `${IMAGE_HOST}/${size}${path}` : null;
   }
 
-  // La key se lee de la variable de entorno VITE_TMDB_API_KEY (ver .env)
-  constructor(apiKey = import.meta.env.VITE_TMDB_API_KEY, baseUrl = BASE_URL) {
-    this.apiKey = apiKey;
+  constructor(baseUrl = BASE_URL) {
     this.baseUrl = baseUrl;
   }
 
-  // Petición genérica: añade la api_key y maneja errores
+  // Petición genérica: construye la URL del proxy y maneja errores
   async #request(path, params = {}) {
-    const url = new URL(`${this.baseUrl}${path}`);
-    url.searchParams.set("api_key", this.apiKey);
+    const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
     url.searchParams.set("language", "es-ES");
     for (const [key, value] of Object.entries(params)) {
       if (value != null) url.searchParams.set(key, value);
