@@ -4,6 +4,18 @@
 // su Function URL no se publica) y sirve los assets estáticos del resto.
 const TMDB_BASE = 'https://api.themoviedb.org/3'
 
+// Allowlist de los únicos endpoints de TMDB que usa la app. Sin ella, el
+// proxy reenviaría CUALQUIER ruta con nuestra key: cualquiera podría usar
+// este dominio como proxy gratuito de toda la API de TMDB y quemar la cuota.
+const RUTAS_TMDB = [
+  /^\/trending\/all\/(day|week)$/,
+  /^\/search\/multi$/,
+  /^\/movie\/\d+$/,
+  /^\/tv\/\d+$/,
+  /^\/tv\/\d+\/season\/\d+$/,
+  /^\/tv\/\d+\/season\/\d+\/episode\/\d+$/,
+]
+
 // Rutas que expone la API de usuarios, sin reescritura: el navegador llama
 // a /favoritos y la Lambda recibe /favoritos. Se comparan con cuidado
 // (=== o prefijo con barra) para no comerle rutas a la SPA por accidente.
@@ -27,14 +39,17 @@ export default {
       }
 
       // /api/tv/123 → https://api.themoviedb.org/3/tv/123
-      const target = new URL(`${TMDB_BASE}${url.pathname.slice('/api'.length)}`)
+      const rutaTmdb = url.pathname.slice('/api'.length)
+      if (!RUTAS_TMDB.some((regla) => regla.test(rutaTmdb))) {
+        return Response.json({ error: 'Ruta no soportada' }, { status: 404 })
+      }
+      const target = new URL(`${TMDB_BASE}${rutaTmdb}`)
 
       // conservamos los query params del cliente (query, language...) y añadimos la key
       url.searchParams.forEach((value, key) => target.searchParams.set(key, value))
       target.searchParams.set('api_key', env.TMDB_API_KEY)
 
       const res = await fetch(target, { headers: { Accept: 'application/json' } })
-
       return new Response(res.body, {
         status: res.status,
         headers: {
