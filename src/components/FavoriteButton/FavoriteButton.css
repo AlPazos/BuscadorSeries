@@ -1,0 +1,34 @@
+.favorite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  /* pensado para ir sobre un póster: velo oscuro y corazón blanco */
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s, color 0.2s;
+
+  &:hover {
+    transform: scale(1.12);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* guardado: corazón relleno en rojo (doble clase: debe ganar también a las
+   variantes de color que aplique quien lo usa, como .detail-fav) */
+.favorite-button.favorite-button--on {
+  color: #e5484d;
+}

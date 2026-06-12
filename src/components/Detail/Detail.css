@@ -144,6 +144,13 @@
   gap: 10px;
 }
 
+/* el corazón en el panel va sobre fondo claro/oscuro del tema, no sobre
+   un póster: colores de acento en vez del velo oscuro */
+.detail-fav {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
 .detail-tag {
   font-size: 13px;
   padding: 3px 10px;

@@ -1,6 +1,7 @@
 .card {
   display: flex;
   flex-direction: column;
+  position: relative; /* ancla el corazón de favorito a la esquina */
   width: 220px;
   box-sizing: border-box; /* el borde cuenta dentro del width (clave para el 50% en móvil) */
   border: 1px solid var(--border);
@@ -33,6 +34,13 @@
   .card-plot {
     display: none; /* en pantallas pequeñas la sinopsis satura la card */
   }
+}
+
+/* corazón de favorito en la esquina del póster */
+.card-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 .card-image {

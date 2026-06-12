@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Seasons from '../Seasons/Seasons.jsx'
+import FavoriteButton from '../FavoriteButton/FavoriteButton.jsx'
 import { TmdbApi } from '../../api/TmdbApi.js'
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock.js'
 import './Detail.css'
@@ -71,6 +72,7 @@ function Detail({ title, onBack }) {
             )}
 
             <div className="detail-meta">
+              <FavoriteButton title={title} className="detail-fav" />
               {type && <span className="detail-tag">{type}</span>}
               {rating != null && (
                 <span className="detail-rating">
@@ -84,9 +86,12 @@ function Detail({ title, onBack }) {
           </div>
         </div>
 
-        {/* temporadas/episodios solo para series */}
+        {/* temporadas/episodios solo para series. key: si cambia la serie,
+            React desmonta y monta un Seasons nuevo con el estado a cero —
+            más simple que resetearlo a mano con un efecto */}
         {type === 'tv' && (
           <Seasons
+            key={title.id}
             seriesId={title.id}
             onEpisodeClick={(ep) => setEpisode(episodeToTitle(ep))}
           />

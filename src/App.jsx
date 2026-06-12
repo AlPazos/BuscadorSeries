@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import Card from './components/Card/Card.jsx'
 import Detail from './components/Detail/Detail.jsx'
@@ -6,10 +6,44 @@ import BlurText from './components/BlurText/BlurText.jsx'
 import CardNav from './components/CardNav/CardNav.jsx'
 import AuthModal from './components/AuthModal/AuthModal.jsx'
 import { useAuth } from './auth/AuthContext.jsx'
+import { FavoritosProvider, useFavoritos } from './favoritos/FavoritosContext.jsx'
+import Favorites from './components/Favorites/Favorites.jsx'
 import { TmdbApi } from './api/TmdbApi.js'
 import { useDebounce } from './hooks/useDebounce.js'
 
 const tmdb = new TmdbApi()
+
+// Cuadrícula de resultados. Las cards salen en cuanto llegan los títulos de
+// TMDB, sin esperar a la lista de favoritos: es el corazón (FavoriteButton)
+// el que no se pinta hasta conocer la verdad, así nunca aparece en falso.
+// Es un componente aparte porque App renderiza el FavoritosProvider y no
+// puede consumir su contexto; este sí, porque vive dentro.
+function Resultados({ titles, onSelect }) {
+  const { errorCarga, reintentarCarga } = useFavoritos()
+
+  return (
+    <>
+      {/* si los favoritos no se pudieron cargar, los corazones no aparecen:
+          avisar y ofrecer reintentar, sin bloquear el catálogo */}
+      {errorCarga && (
+        <p className="aviso-cargando">
+          No se han podido cargar tus favoritos.{' '}
+          <button className="boton-reintentar" onClick={reintentarCarga}>
+            Reintentar
+          </button>
+        </p>
+      )}
+
+      <div className="cards-grid">
+        {titles.map((t) => (
+          // los ids de TMDB son únicos POR TIPO (una película y una serie
+          // pueden compartir id): la key necesita el tipo para no colisionar
+          <Card key={`${t.type}-${t.id}`} title={t} onClick={onSelect} />
+        ))}
+      </div>
+    </>
+  )
+}
 
 function App() {
   const { usuario, logout } = useAuth()
@@ -17,17 +51,34 @@ function App() {
   const [titles, setTitles] = useState([])
   const [selected, setSelected] = useState(null) // title abierto en detalle
   const [modalAuth, setModalAuth] = useState(null) // null | 'login' | 'registro'
+  const [vista, setVista] = useState('explorar') // 'explorar' | 'favoritos'
+
+  // la vista de favoritos solo tiene sentido con sesión: si caduca o se
+  // cierra, se vuelve a explorar sin tener que sincronizar nada a mano
+  const enFavoritos = vista === 'favoritos' && usuario != null
+
+  // useCallback: identidad estable entre renders; si fuera un arrow inline,
+  // el value memoizado de FavoritosProvider se invalidaría en cada render
+  // de App y los corazones se re-renderizarían sin necesidad
+  const pedirLogin = useCallback(() => setModalAuth('login'), [])
 
   // query "retrasado": solo cambia 400ms después de la última tecla
   const debouncedQuery = useDebounce(query, 400)
 
   useEffect(() => {
-    // sin búsqueda → mostramos los titles en tendencia
-    if (!debouncedQuery.trim()) {
-      tmdb.getTrending().then(setTitles)
-      return
+    // `cancelado` evita una condición de carrera: si la búsqueda cambia con
+    // una petición aún en vuelo, su respuesta (que puede llegar DESPUÉS que
+    // la de la búsqueda nueva) se descarta en vez de pisar los resultados
+    let cancelado = false
+    const peticion = debouncedQuery.trim()
+      ? tmdb.searchTitles(debouncedQuery)
+      : tmdb.getTrending() // sin búsqueda → los titles en tendencia
+    peticion
+      .then((lista) => !cancelado && setTitles(lista))
+      .catch(() => {}) // TMDB caído: se conserva lo que hubiera en pantalla
+    return () => {
+      cancelado = true
     }
-    tmdb.searchTitles(debouncedQuery).then(setTitles)
   }, [debouncedQuery])
 
   // Tarjetas del menú del nav; la de "Cuenta" cambia según haya sesión o no.
@@ -39,7 +90,14 @@ function App() {
       bgColor: 'var(--code-bg)',
       textColor: 'var(--text-h)',
       links: [
-        { label: 'Tendencias', onClick: () => setQuery(''), ariaLabel: 'Ver tendencias' },
+        {
+          label: 'Tendencias',
+          onClick: () => {
+            setQuery('')
+            setVista('explorar')
+          },
+          ariaLabel: 'Ver tendencias',
+        },
         { label: 'TMDB', href: 'https://www.themoviedb.org/', target: '_blank' },
       ],
     },
@@ -48,7 +106,10 @@ function App() {
           label: 'Cuenta',
           bgColor: 'var(--accent)',
           textColor: '#fff',
-          links: [{ label: 'Cerrar sesión', onClick: logout }],
+          links: [
+            { label: 'Mis favoritos', onClick: () => setVista('favoritos') },
+            { label: 'Cerrar sesión', onClick: logout },
+          ],
         }
       : {
           label: 'Cuenta',
@@ -62,9 +123,12 @@ function App() {
   ], [usuario, logout])
 
   return (
-    <>
+    // El provider vive aquí (y no en main.jsx) porque necesita abrir el modal
+    // de login, que es estado de App. Va dentro de AuthProvider, que ya
+    // envuelve a App entera, así que useAuth() funciona en su interior.
+    <FavoritosProvider alPedirSesion={pedirLogin}>
       <CardNav
-        logo="/favicon.svg"
+        logo="/favicon.png"
         logoAlt="Buscador de películas y series"
         logoText="Buscador"
         items={itemsNav}
@@ -80,18 +144,20 @@ function App() {
         delay={150}
       />
 
-      <input
-        className="search-input"
-        placeholder="Introduce lo que quieres buscar"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
+      {enFavoritos ? (
+        <Favorites onSelect={setSelected} />
+      ) : (
+        <>
+          <input
+            className="search-input"
+            placeholder="Introduce lo que quieres buscar"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
 
-      <div className="cards-grid">
-        {titles.map((t) => (
-          <Card key={t.id} title={t} onClick={setSelected} />
-        ))}
-      </div>
+          <Resultados titles={titles} onSelect={setSelected} />
+        </>
+      )}
 
       {/* detalle como modal centrado */}
       {selected && <Detail title={selected} onBack={() => setSelected(null)} />}
@@ -114,7 +180,7 @@ function App() {
           Este producto usa la API de TMDB, pero no está avalado ni certificado por TMDB.
         </p>
       </footer>
-    </>
+    </FavoritosProvider>
   )
 }
 

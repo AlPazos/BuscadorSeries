@@ -1,3 +1,5 @@
+import { memo } from 'react'
+import FavoriteButton from '../FavoriteButton/FavoriteButton.jsx'
 import './Card.css'
 
 // Recibe un `title` normalizado por TmdbApi y muestra toda su info.
@@ -30,6 +32,9 @@ function Card({ title, onClick }) {
         <div className="card-image card-image--empty">Sin imagen</div>
       )}
 
+      {/* corazón sobre la esquina del póster */}
+      <FavoriteButton title={title} className="card-fav" />
+
       <div className="card-body">
         <h3 className="card-title">
           {name}
@@ -58,4 +63,6 @@ function Card({ title, onClick }) {
   )
 }
 
-export default Card
+// memo: React se salta el render si las props no han cambiado — así las
+// teclas del buscador (que re-renderizan App entera) no repintan cada card
+export default memo(Card)

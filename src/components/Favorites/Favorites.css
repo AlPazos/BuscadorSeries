@@ -1,0 +1,8 @@
+.favorites-titulo {
+  margin: 18px 0 0;
+}
+
+.favorites-aviso {
+  margin: 48px 20px;
+  color: var(--text);
+}
