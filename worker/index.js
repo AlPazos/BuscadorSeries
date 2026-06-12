@@ -1,7 +1,17 @@
 // Worker de la app: hace de proxy hacia la API de TMDB en /api/* añadiendo
-// la key (secret TMDB_API_KEY del Worker, nunca visible en el navegador)
-// y sirve los assets estáticos del build para el resto de rutas.
+// la key (secret TMDB_API_KEY del Worker, nunca visible en el navegador),
+// reenvía las rutas de la API de usuarios a la Lambda (secret API_USUARIOS_URL,
+// su Function URL no se publica) y sirve los assets estáticos del resto.
 const TMDB_BASE = 'https://api.themoviedb.org/3'
+
+// Rutas que expone la API de usuarios, sin reescritura: el navegador llama
+// a /favoritos y la Lambda recibe /favoritos. Se comparan con cuidado
+// (=== o prefijo con barra) para no comerle rutas a la SPA por accidente.
+const esRutaDeUsuario = (pathname) =>
+  pathname.startsWith('/auth/') ||
+  pathname === '/favoritos' ||
+  pathname.startsWith('/favoritos/') ||
+  pathname === '/preferencias'
 
 export default {
   async fetch(request, env) {
@@ -32,6 +42,41 @@ export default {
           // cache en el edge/navegador: 5 min es de sobra para tendencias y fichas.
           // Los errores no se cachean: si no, un fallo puntual se queda pegado 5 min.
           'Cache-Control': res.ok ? 'public, max-age=300' : 'no-store',
+        },
+      })
+    }
+
+    if (esRutaDeUsuario(url.pathname)) {
+      if (!env.API_USUARIOS_URL) {
+        return Response.json(
+          { error: 'El secret API_USUARIOS_URL no está configurado en el Worker' },
+          { status: 500 }
+        )
+      }
+
+      // misma ruta y query, pero sobre la Function URL de la Lambda
+      const target = new URL(url.pathname + url.search, env.API_USUARIOS_URL)
+
+      // reenviamos solo lo que la API necesita (token y tipo del body);
+      // el resto de cabeceras del navegador no le aporta nada
+      const headers = new Headers({ Accept: 'application/json' })
+      for (const nombre of ['Authorization', 'Content-Type']) {
+        const valor = request.headers.get(nombre)
+        if (valor) headers.set(nombre, valor)
+      }
+
+      const res = await fetch(target, {
+        method: request.method,
+        headers,
+        body: request.body,
+      })
+
+      return new Response(res.body, {
+        status: res.status,
+        headers: {
+          'Content-Type': 'application/json',
+          // datos de cuentas: nunca cachear, ni en el edge ni en el navegador
+          'Cache-Control': 'no-store',
         },
       })
     }

@@ -22,6 +22,14 @@ export default defineConfig(({ mode }) => {
             return `${stripped}${sep}api_key=${env.TMDB_API_KEY}`
           },
         },
+        // Rutas de la API de usuarios, tal cual (sin reescritura), hacia la
+        // Function URL de la Lambda (API_USUARIOS_URL en .env, gitignorado).
+        // El spread condicional evita romper el arranque si falta la variable.
+        ...(env.API_USUARIOS_URL && {
+          '/auth': { target: env.API_USUARIOS_URL, changeOrigin: true },
+          '/favoritos': { target: env.API_USUARIOS_URL, changeOrigin: true },
+          '/preferencias': { target: env.API_USUARIOS_URL, changeOrigin: true },
+        }),
       },
     },
   }
