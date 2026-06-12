@@ -187,6 +187,14 @@ const CardNav = ({
           <div
             className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''}`}
             onClick={toggleMenu}
+            // un div con role="button" no reacciona al teclado por sí solo
+            // (un <button> de verdad sí lo haría): Enter/Espacio manuales
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault() // que Espacio no haga scroll de la página
+                toggleMenu()
+              }
+            }}
             role="button"
             aria-label={isExpanded ? 'Cerrar menú' : 'Abrir menú'}
             tabIndex={0}
