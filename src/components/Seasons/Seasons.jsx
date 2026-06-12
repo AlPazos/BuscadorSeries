@@ -13,11 +13,18 @@ function Seasons({ seriesId, onEpisodeClick }) {
   const [openSeason, setOpenSeason] = useState(null)
   const [episodes, setEpisodes] = useState({}) // { [seasonNumber]: episodes[] }
 
-  // Al cambiar de serie, recargamos temporadas y reseteamos el estado
+  // Carga las temporadas al montar. No hace falta resetear nada al cambiar
+  // de serie: quien usa este componente le pone key={seriesId}, así que un
+  // cambio de serie monta un Seasons nuevo con todo el estado a cero.
   useEffect(() => {
-    setOpenSeason(null)
-    setEpisodes({})
-    tmdb.getSeasons(seriesId).then(setSeasons)
+    let cancelado = false
+    tmdb
+      .getSeasons(seriesId)
+      .then((lista) => !cancelado && setSeasons(lista))
+      .catch(() => {}) // sin temporadas, la sección simplemente no se muestra
+    return () => {
+      cancelado = true
+    }
   }, [seriesId])
 
   const toggleSeason = async (seasonNumber) => {
