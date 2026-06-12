@@ -64,6 +64,12 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  /* hueco para el CardNav, que flota sobre la página (top 2em + 60px de barra) */
+  padding-top: 104px;
+
+  @media (max-width: 768px) {
+    padding-top: 88px;
+  }
 }
 
 h1,

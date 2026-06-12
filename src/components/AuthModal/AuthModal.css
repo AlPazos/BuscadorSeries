@@ -1,0 +1,171 @@
+/* Capa que cubre la pantalla y centra el modal (mismo patrón que Detail,
+   pero por encima del CardNav y de un posible Detail abierto) */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: rgba(0, 0, 0, 0.55);
+  animation: auth-overlay-in 0.2s ease;
+}
+
+.auth-modal {
+  position: relative; /* para anclar el botón de cerrar */
+  box-sizing: border-box; /* que el padding no sume al width en pantallas estrechas */
+  width: min(480px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+  padding: 28px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: auth-modal-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes auth-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes auth-modal-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.auth-cerrar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 50%;
+  color: var(--text);
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--text-h);
+  }
+}
+
+.auth-titulo {
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+/* --- formulario de login --- */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-h);
+
+  input {
+    padding: 10px 14px;
+    box-sizing: border-box;
+    font-size: 16px; /* >=16px evita el zoom automático de iOS al enfocar */
+    font-family: inherit;
+    color: var(--text-h);
+    background: var(--social-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.auth-enviar {
+  margin-top: 6px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 500;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+
+  &:hover {
+    opacity: 0.85;
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+/* enlace para alternar entre login y registro */
+.auth-cambio {
+  margin-top: 4px;
+  align-self: center;
+  background: none;
+  border: none;
+  padding: 4px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--accent);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.auth-error {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: #e5484d;
+}
+
+.auth-aviso {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* --- registro con Stepper --- */
+
+.auth-registro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-registro .auth-cambio {
+  margin-top: 0;
+}
+
+/* los pasos del stepper reutilizan .auth-campo; un poco de aire entre campos */
+.step-default h3 {
+  margin: 0 0 12px;
+  color: var(--text-h);
+}
+
+.step-default .auth-campo + .auth-campo {
+  margin-top: 10px;
+}

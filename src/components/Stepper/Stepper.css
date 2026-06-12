@@ -1,0 +1,165 @@
+/* CSS del Stepper de React Bits, adaptado: colores con las variables de tema,
+   estado :disabled en los botones, y sin los aspect-ratio de la demo
+   (aquí el stepper vive dentro del modal de registro) */
+/* el CSS original de React Bits asume el reset global `box-sizing: border-box`
+   (su demo lo tiene); este proyecto no, así que lo aplicamos acotado aquí
+   para que width:100% + padding no desborde */
+.outer-container,
+.outer-container * {
+  box-sizing: border-box;
+}
+
+.outer-container {
+  display: flex;
+  min-height: 100%;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.step-circle-container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 1.25rem;
+  background-color: var(--social-bg);
+}
+
+.step-indicator-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.step-content-default {
+  position: relative;
+  overflow: hidden;
+}
+
+.step-default {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  /* hueco para el anillo de foco de los inputs (outline 2px + offset 2px):
+     se dibuja fuera de su caja y el overflow:hidden del paso lo recortaba */
+  padding-bottom: 6px;
+}
+
+.footer-container {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.footer-nav {
+  margin-top: 2rem;
+  display: flex;
+}
+
+.footer-nav.spread {
+  justify-content: space-between;
+}
+
+.footer-nav.end {
+  justify-content: flex-end;
+}
+
+.back-button {
+  transition: all 350ms;
+  border: none;
+  background: none;
+  font: inherit;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.back-button:hover {
+  color: var(--text-h);
+}
+
+.back-button.inactive {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.next-button {
+  transition: all 350ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  background-color: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  padding: 0.375rem 1rem;
+  cursor: pointer;
+}
+
+.next-button:hover {
+  opacity: 0.85;
+}
+
+/* paso incompleto o petición en vuelo: el botón no se puede pulsar */
+.next-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.step-indicator {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.step-indicator-inner {
+  display: flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.active-dot {
+  height: 0.75rem;
+  width: 0.75rem;
+  border-radius: 9999px;
+  background-color: #fff;
+}
+
+.step-number {
+  font-size: 0.875rem;
+}
+
+.step-connector {
+  position: relative;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  height: 0.125rem;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  background-color: var(--border);
+}
+
+.step-connector-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.check-icon {
+  height: 1rem;
+  width: 1rem;
+  color: #fff;
+}
