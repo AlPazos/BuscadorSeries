@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import './App.css'
 import Card from './components/Card/Card.jsx'
 import Detail from './components/Detail/Detail.jsx'
@@ -74,11 +75,10 @@ function App() {
   const [selected, setSelected] = useState(null) // title abierto en detalle
   const [modalAuth, setModalAuth] = useState(null) // null | 'login' | 'registro'
   const [confirmarSalir, setConfirmarSalir] = useState(false) // diálogo de logout
-  const [vista, setVista] = useState('descubrir') // 'descubrir' | 'buscar' | 'favoritos'
 
-  // la vista de favoritos solo tiene sentido con sesión: si caduca o se
-  // cierra, se vuelve a Descubrir sin tener que sincronizar nada a mano
-  const vistaEfectiva = vista === 'favoritos' && usuario == null ? 'descubrir' : vista
+  // navegación por rutas: las vistas tienen URL (/, /buscar, /mis-favoritos)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   // useCallback: identidad estable entre renders; si fuera un arrow inline,
   // el value memoizado de FavoritosProvider se invalidaría en cada render
@@ -120,12 +120,12 @@ function App() {
       links: [
         {
           label: 'Descubrir',
-          onClick: () => setVista('descubrir'),
+          onClick: () => navigate('/'),
           ariaLabel: 'Ir a Descubrir',
         },
         {
           label: 'Buscar',
-          onClick: () => setVista('buscar'),
+          onClick: () => navigate('/buscar'),
           ariaLabel: 'Ir a Buscar',
         },
         { label: 'TMDB', href: 'https://www.themoviedb.org/', target: '_blank' },
@@ -137,7 +137,7 @@ function App() {
           bgColor: 'var(--accent)',
           textColor: '#fff',
           links: [
-            { label: 'Mis favoritos', onClick: () => setVista('favoritos') },
+            { label: 'Mis favoritos', onClick: () => navigate('/mis-favoritos') },
             { label: 'Cerrar sesión', onClick: () => setConfirmarSalir(true) },
           ],
         }
@@ -150,7 +150,7 @@ function App() {
             { label: 'Crear cuenta', onClick: () => setModalAuth('registro') },
           ],
         },
-  ], [usuario])
+  ], [usuario, navigate])
 
   return (
     // El provider vive aquí (y no en main.jsx) porque necesita abrir el modal
@@ -165,42 +165,60 @@ function App() {
         ctaLabel={usuario ? 'Salir' : 'Entrar'}
         ctaIcon={usuario ? IconoSalir : IconoEntrar}
         onCtaClick={usuario ? () => setConfirmarSalir(true) : () => setModalAuth('login')}
-        onLogoClick={() => setVista('buscar')}
+        onLogoClick={() => navigate('/buscar')}
         topRightExtra={<ThemeToggle />}
       />
 
-      {/* el `key` cambia al alternar vista → el div se remonta y dispara la
-          animación de entrada (no cambia al teclear, así no se reanima en
-          cada búsqueda) */}
-      <div className="vista" key={vistaEfectiva}>
-        {vistaEfectiva === 'favoritos' ? (
-          <Favorites onSelect={setSelected} />
-        ) : vistaEfectiva === 'buscar' ? (
-          <>
-            <BlurText
-              as="h1"
-              className="vista-titulo"
-              text="Buscador"
-              animateBy="letters"
-              direction="top"
-              delay={60}
-            />
-            <SearchBar
-              value={query}
-              onChange={setQuery}
-              placeholder="Busca una película o serie…"
-            />
+      {/* el `key` por pathname remonta el contenedor al cambiar de ruta y
+          dispara la animación de entrada (no cambia al teclear en el buscador,
+          así no se reanima en cada búsqueda) */}
+      <div className="vista" key={location.pathname}>
+        <Routes>
+          <Route path="/" element={<Descubrir onSelect={setSelected} />} />
 
-            {/* sin texto: orbit decorativo de pósters; con texto: resultados */}
-            {query.trim() ? (
-              <Resultados titles={resultados} onSelect={setSelected} />
-            ) : (
-              <OrbitImages />
-            )}
-          </>
-        ) : (
-          <Descubrir onSelect={setSelected} />
-        )}
+          <Route
+            path="/buscar"
+            element={
+              <>
+                <BlurText
+                  as="h1"
+                  className="vista-titulo"
+                  text="Buscador"
+                  animateBy="letters"
+                  direction="top"
+                  delay={60}
+                />
+                <SearchBar
+                  value={query}
+                  onChange={setQuery}
+                  placeholder="Busca una película o serie…"
+                />
+
+                {/* sin texto: orbit decorativo; con texto: resultados */}
+                {query.trim() ? (
+                  <Resultados titles={resultados} onSelect={setSelected} />
+                ) : (
+                  <OrbitImages />
+                )}
+              </>
+            }
+          />
+
+          {/* favoritos solo con sesión: si no hay (o caduca), a Descubrir */}
+          <Route
+            path="/mis-favoritos"
+            element={
+              usuario ? (
+                <Favorites onSelect={setSelected} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+
+          {/* cualquier otra ruta → Descubrir */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
 
       {/* detalle como modal centrado */}
