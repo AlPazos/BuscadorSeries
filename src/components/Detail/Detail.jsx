@@ -31,10 +31,7 @@ function Detail({ title, onBack }) {
 
   if (!title) return null
 
-  const { type, title: name, originalTitle, year, image, rating, votes, plot } = title
-
-  // los fotogramas de episodio son 16:9; los pósters, 2:3
-  const isEpisode = type === 'episode'
+  const { type, title: name, originalTitle, year, image, rating, votes, plot, genres } = title
 
   return (
     // Overlay: centra el panel y cierra al clicar fuera.
@@ -47,20 +44,23 @@ function Detail({ title, onBack }) {
         onBack()
       }}
     >
-      <div className="detail" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`detail${image ? ' detail--immersive' : ''}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* fondo inmersivo: el propio póster, ampliado y difuminado, con un
+            degradado que se funde con el panel (decorativo, aria-hidden) */}
+        {image && (
+          <div className="detail-backdrop" aria-hidden="true">
+            <img src={image} alt="" />
+          </div>
+        )}
+
         <button className="detail-back" onClick={onBack}>
           ← Volver
         </button>
 
         <div className="detail-content">
-          {image ? (
-            <div className={`detail-image${isEpisode ? ' detail-image--wide' : ''}`}>
-              <img src={image} alt={name} />
-            </div>
-          ) : (
-            <div className="detail-image detail-image--empty">Sin imagen</div>
-          )}
-
           <div className="detail-info">
             <h2 className="detail-title">
               {name}
@@ -72,8 +72,7 @@ function Detail({ title, onBack }) {
             )}
 
             <div className="detail-meta">
-              <FavoriteButton title={title} className="detail-fav" />
-              {type && <span className="detail-tag">{type}</span>}
+              <FavoriteButton title={title} className="detail-fav" withLabel />
               {rating != null && (
                 <span className="detail-rating">
                   ⭐ {rating}
@@ -81,6 +80,16 @@ function Detail({ title, onBack }) {
                 </span>
               )}
             </div>
+
+            {genres?.length > 0 && (
+              <div className="detail-genres">
+                {genres.map((g) => (
+                  <span key={g} className="detail-genre">
+                    {g}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {plot && <p className="detail-plot">{plot}</p>}
           </div>

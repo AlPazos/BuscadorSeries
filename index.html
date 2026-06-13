@@ -4,7 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Space Grotesk: tipografía grotesca con carácter, base del rediseño -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <title>Buscador series y pelis</title>
+    <!-- Fija el tema guardado ANTES de pintar, para evitar el parpadeo (FOUC).
+         Si no hay nada guardado, no toca nada y se sigue la preferencia del
+         sistema (prefers-color-scheme). -->
+    <script>
+      try {
+        var t = localStorage.getItem('tema')
+        if (t === 'light' || t === 'dark')
+          document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

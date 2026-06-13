@@ -7,8 +7,11 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px; /* margen para que el panel NO ocupe toda la pantalla */
-  background: rgba(0, 0, 0, 0.55);
-  animation: overlay-in 0.2s ease;
+  background: rgba(8, 4, 20, 0.6);
+  /* el catálogo de detrás se desenfoca al abrir el detalle */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: overlay-in 0.25s ease;
 }
 
 /* Panel: se abre desde el centro creciendo (scale + fade) */
@@ -21,9 +24,14 @@
   padding: 28px;
   border-radius: 14px;
   background: var(--bg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  animation: detail-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  border: 1px solid var(--accent-border);
+  /* halo neón alrededor del panel */
+  box-shadow:
+    var(--shadow),
+    0 0 30px -8px var(--neon-magenta),
+    0 0 40px -12px var(--neon-cian);
+  animation: detail-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes overlay-in {
@@ -36,19 +44,89 @@
   to { opacity: 1; transform: scale(1); }
 }
 
+/* --- Fondo inmersivo: el póster ampliado y difuminado en la cabecera --- */
+.detail-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 360px;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.detail-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  /* difuminado + saturación neón; el scale oculta los bordes del blur */
+  filter: blur(7px) saturate(1.35);
+  transform: scale(1.12);
+}
+
+/* degradado que funde la imagen con el fondo del panel */
+.detail-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 4, 20, 0.35) 0%,
+    rgba(8, 4, 20, 0.1) 40%,
+    var(--bg) 96%
+  );
+}
+
+/* en modo inmersivo el contenido baja para solaparse con la cabecera */
+.detail--immersive .detail-back {
+  position: relative;
+  z-index: 2;
+}
+
+.detail--immersive .detail-content {
+  position: relative;
+  z-index: 1;
+  margin-top: 170px;
+}
+
+/* el título y la sinopsis quedan sobre el fondo: una sombra suave los
+   mantiene legibles aunque caigan sobre una zona clara de la imagen */
+.detail--immersive .detail-title {
+  font-size: 34px;
+  text-shadow: 0 2px 14px rgba(8, 4, 20, 0.55);
+}
+
+.detail--immersive .detail-plot {
+  text-shadow: 0 1px 8px rgba(8, 4, 20, 0.4);
+}
+
 .detail-back {
   margin-bottom: 20px;
   font-size: 15px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  /* píldora glass legible sobre el fondo inmersivo (cualquier imagen) */
+  color: #fff;
+  background: rgba(8, 4, 20, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--accent-border);
   cursor: pointer;
-  transition: border-color 0.3s;
+  transition:
+    box-shadow 0.3s ease,
+    background-color 0.3s ease,
+    transform 0.15s ease;
 
   &:hover {
-    border-color: var(--accent-border);
+    background: rgba(8, 4, 20, 0.7);
+    box-shadow:
+      0 0 16px -3px var(--neon-magenta),
+      0 0 22px -7px var(--neon-cian);
+    transform: translateY(-1px);
   }
 }
 
@@ -61,27 +139,6 @@
     align-items: center;
     text-align: center;
   }
-}
-
-.detail-image {
-  width: 280px;
-  aspect-ratio: 2 / 3; /* misma proporción que la card: sin deformación */
-  flex-shrink: 0;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.detail-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Variante para episodios: fotograma 16:9 en vez de póster 2:3 */
-.detail-image--wide {
-  width: min(420px, 100%);
-  aspect-ratio: 16 / 9;
 }
 
 /* Móvil: aprovechar la pantalla y reducir rellenos */
@@ -99,19 +156,14 @@
     font-size: 22px;
   }
 
-  .detail-image {
-    width: min(280px, 100%);
+  /* cabecera inmersiva más baja en móvil */
+  .detail-backdrop {
+    height: 240px;
   }
-}
 
-.detail-image--empty {
-  width: 280px;
-  aspect-ratio: 2 / 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-h);
-  background: var(--accent-bg);
+  .detail--immersive .detail-content {
+    margin-top: 110px;
+  }
 }
 
 .detail-info {
@@ -151,13 +203,35 @@
   background: var(--accent-bg);
 }
 
-.detail-tag {
+/* chips de género (Aventura, Suspense, …) bajo la fila de meta */
+.detail-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  @media (max-width: 720px) {
+    justify-content: center;
+  }
+}
+
+.detail-genre {
   font-size: 13px;
-  padding: 3px 10px;
+  font-weight: 600;
+  padding: 4px 12px;
   border-radius: 999px;
   color: var(--accent);
   background: var(--accent-bg);
-  text-transform: capitalize;
+  border: 1px solid var(--accent-border);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+}
+
+.detail-genre:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 12px -3px var(--neon-magenta),
+    0 0 16px -7px var(--neon-cian);
 }
 
 .detail-rating {

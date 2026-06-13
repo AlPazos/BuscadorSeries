@@ -4,14 +4,34 @@ import Card from './components/Card/Card.jsx'
 import Detail from './components/Detail/Detail.jsx'
 import BlurText from './components/BlurText/BlurText.jsx'
 import CardNav from './components/CardNav/CardNav.jsx'
+import ThemeToggle from './components/ThemeToggle/ThemeToggle.jsx'
+import SearchBar from './components/SearchBar/SearchBar.jsx'
 import AuthModal from './components/AuthModal/AuthModal.jsx'
+import ConfirmDialog from './components/ConfirmDialog/ConfirmDialog.jsx'
 import { useAuth } from './auth/AuthContext.jsx'
 import { FavoritosProvider, useFavoritos } from './favoritos/FavoritosContext.jsx'
 import Favorites from './components/Favorites/Favorites.jsx'
+import Descubrir from './components/Descubrir/Descubrir.jsx'
 import { TmdbApi } from './api/TmdbApi.js'
 import { useDebounce } from './hooks/useDebounce.js'
 
 const tmdb = new TmdbApi()
+
+// iconos del CTA del nav (salir / entrar)
+const IconoSalir = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <path d="m16 17 5-5-5-5" />
+    <path d="M21 12H9" />
+  </svg>
+)
+const IconoEntrar = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+    <path d="m10 17 5-5-5-5" />
+    <path d="M15 12H3" />
+  </svg>
+)
 
 // Cuadrícula de resultados. Las cards salen en cuanto llegan los títulos de
 // TMDB, sin esperar a la lista de favoritos: es el corazón (FavoriteButton)
@@ -35,10 +55,10 @@ function Resultados({ titles, onSelect }) {
       )}
 
       <div className="cards-grid">
-        {titles.map((t) => (
+        {titles.map((t, i) => (
           // los ids de TMDB son únicos POR TIPO (una película y una serie
           // pueden compartir id): la key necesita el tipo para no colisionar
-          <Card key={`${t.type}-${t.id}`} title={t} onClick={onSelect} />
+          <Card key={`${t.type}-${t.id}`} title={t} index={i} onClick={onSelect} />
         ))}
       </div>
     </>
@@ -51,11 +71,12 @@ function App() {
   const [titles, setTitles] = useState([])
   const [selected, setSelected] = useState(null) // title abierto en detalle
   const [modalAuth, setModalAuth] = useState(null) // null | 'login' | 'registro'
-  const [vista, setVista] = useState('explorar') // 'explorar' | 'favoritos'
+  const [confirmarSalir, setConfirmarSalir] = useState(false) // diálogo de logout
+  const [vista, setVista] = useState('descubrir') // 'descubrir' | 'buscar' | 'favoritos'
 
   // la vista de favoritos solo tiene sentido con sesión: si caduca o se
-  // cierra, se vuelve a explorar sin tener que sincronizar nada a mano
-  const enFavoritos = vista === 'favoritos' && usuario != null
+  // cierra, se vuelve a Descubrir sin tener que sincronizar nada a mano
+  const vistaEfectiva = vista === 'favoritos' && usuario == null ? 'descubrir' : vista
 
   // useCallback: identidad estable entre renders; si fuera un arrow inline,
   // el value memoizado de FavoritosProvider se invalidaría en cada render
@@ -66,20 +87,25 @@ function App() {
   const debouncedQuery = useDebounce(query, 400)
 
   useEffect(() => {
+    // sin texto no se busca nada (las tendencias viven ahora en "Descubrir")
+    const q = debouncedQuery.trim()
+    if (!q) return
     // `cancelado` evita una condición de carrera: si la búsqueda cambia con
     // una petición aún en vuelo, su respuesta (que puede llegar DESPUÉS que
     // la de la búsqueda nueva) se descarta en vez de pisar los resultados
     let cancelado = false
-    const peticion = debouncedQuery.trim()
-      ? tmdb.searchTitles(debouncedQuery)
-      : tmdb.getTrending() // sin búsqueda → los titles en tendencia
-    peticion
+    tmdb
+      .searchTitles(q)
       .then((lista) => !cancelado && setTitles(lista))
       .catch(() => {}) // TMDB caído: se conserva lo que hubiera en pantalla
     return () => {
       cancelado = true
     }
   }, [debouncedQuery])
+
+  // con el buscador vacío no se muestran resultados (sin esperar al debounce
+  // para vaciar): así al borrar la búsqueda las cards desaparecen al instante
+  const resultados = query.trim() ? titles : []
 
   // Tarjetas del menú del nav; la de "Cuenta" cambia según haya sesión o no.
   // useMemo: solo se recrean al cambiar la sesión — CardNav reconstruye su
@@ -91,12 +117,14 @@ function App() {
       textColor: 'var(--text-h)',
       links: [
         {
-          label: 'Tendencias',
-          onClick: () => {
-            setQuery('')
-            setVista('explorar')
-          },
-          ariaLabel: 'Ver tendencias',
+          label: 'Descubrir',
+          onClick: () => setVista('descubrir'),
+          ariaLabel: 'Ir a Descubrir',
+        },
+        {
+          label: 'Buscar',
+          onClick: () => setVista('buscar'),
+          ariaLabel: 'Ir a Buscar',
         },
         { label: 'TMDB', href: 'https://www.themoviedb.org/', target: '_blank' },
       ],
@@ -108,7 +136,7 @@ function App() {
           textColor: '#fff',
           links: [
             { label: 'Mis favoritos', onClick: () => setVista('favoritos') },
-            { label: 'Cerrar sesión', onClick: logout },
+            { label: 'Cerrar sesión', onClick: () => setConfirmarSalir(true) },
           ],
         }
       : {
@@ -120,7 +148,7 @@ function App() {
             { label: 'Crear cuenta', onClick: () => setModalAuth('registro') },
           ],
         },
-  ], [usuario, logout])
+  ], [usuario])
 
   return (
     // El provider vive aquí (y no en main.jsx) porque necesita abrir el modal
@@ -133,31 +161,40 @@ function App() {
         logoText="Buscador"
         items={itemsNav}
         ctaLabel={usuario ? 'Salir' : 'Entrar'}
-        onCtaClick={usuario ? logout : () => setModalAuth('login')}
+        ctaIcon={usuario ? IconoSalir : IconoEntrar}
+        onCtaClick={usuario ? () => setConfirmarSalir(true) : () => setModalAuth('login')}
+        onLogoClick={() => setVista('buscar')}
+        topRightExtra={<ThemeToggle />}
       />
 
-      <BlurText
-        as="h1"
-        text="Buscador de películas y series"
-        animateBy="words"
-        direction="top"
-        delay={150}
-      />
+      {/* el `key` cambia al alternar vista → el div se remonta y dispara la
+          animación de entrada (no cambia al teclear, así no se reanima en
+          cada búsqueda) */}
+      <div className="vista" key={vistaEfectiva}>
+        {vistaEfectiva === 'favoritos' ? (
+          <Favorites onSelect={setSelected} />
+        ) : vistaEfectiva === 'buscar' ? (
+          <>
+            <BlurText
+              as="h1"
+              className="vista-titulo"
+              text="Buscador"
+              animateBy="letters"
+              direction="top"
+              delay={60}
+            />
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              placeholder="Busca una película o serie…"
+            />
 
-      {enFavoritos ? (
-        <Favorites onSelect={setSelected} />
-      ) : (
-        <>
-          <input
-            className="search-input"
-            placeholder="Introduce lo que quieres buscar"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-
-          <Resultados titles={titles} onSelect={setSelected} />
-        </>
-      )}
+            <Resultados titles={resultados} onSelect={setSelected} />
+          </>
+        ) : (
+          <Descubrir onSelect={setSelected} />
+        )}
+      </div>
 
       {/* detalle como modal centrado */}
       {selected && <Detail title={selected} onBack={() => setSelected(null)} />}
@@ -168,6 +205,21 @@ function App() {
           modo={modalAuth}
           onCambiarModo={setModalAuth}
           onClose={() => setModalAuth(null)}
+        />
+      )}
+
+      {/* confirmación antes de cerrar sesión */}
+      {confirmarSalir && (
+        <ConfirmDialog
+          titulo="Cerrar sesión"
+          mensaje="¿Seguro que quieres salir de tu cuenta?"
+          confirmarLabel="Salir"
+          cancelarLabel="Cancelar"
+          onConfirm={() => {
+            logout()
+            setConfirmarSalir(false)
+          }}
+          onCancel={() => setConfirmarSalir(false)}
         />
       )}
 

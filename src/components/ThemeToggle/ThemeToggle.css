@@ -1,0 +1,48 @@
+/* Botón redondo del selector de tema, en la barra del CardNav */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-h);
+  background: var(--social-bg);
+  border: 1px solid var(--accent-border);
+  transition:
+    color 0.2s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  transform: rotate(-15deg) scale(1.08);
+  box-shadow:
+    0 0 14px -2px var(--neon-magenta),
+    0 0 18px -6px var(--neon-cian);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  /* la animación de entrada del icono al cambiar de tema */
+  animation: theme-icon-in 0.35s ease;
+}
+
+@keyframes theme-icon-in {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}

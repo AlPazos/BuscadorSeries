@@ -9,16 +9,55 @@
   overflow: hidden;
   background: var(--social-bg);
   text-align: left;
-  transition: box-shadow 0.3s, transform 0.2s;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.3s ease;
+  will-change: transform;
 
   &:hover {
-    box-shadow: var(--shadow);
-    transform: translateY(-3px);
+    transform: translateY(-8px) scale(1.025);
+    border-color: var(--accent-border);
+    /* resplandor neón magenta + cian alrededor de la tarjeta */
+    box-shadow:
+      0 14px 30px -10px rgba(0, 0, 0, 0.5),
+      0 0 0 1px var(--accent-border),
+      0 0 22px -4px var(--neon-magenta),
+      0 0 30px -6px var(--neon-cian);
+  }
+
+  /* el póster hace zoom dentro de su marco al pasar el ratón */
+  &:hover .card-image img {
+    transform: scale(1.08);
   }
 }
 
 .card--clickable {
   cursor: pointer;
+}
+
+/* Entrada: oculta hasta que el IntersectionObserver añade .is-visible.
+   La animación usa fill `backwards` (no `forwards`) para que, al terminar,
+   el transform vuelva a none y el hover de arriba siga mandando. */
+.card {
+  opacity: 0;
+}
+
+.card.is-visible {
+  opacity: 1;
+  animation: card-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Móvil: dos columnas que aprovechan el ancho */
@@ -54,6 +93,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .card-image--empty {

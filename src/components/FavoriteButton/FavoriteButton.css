@@ -27,8 +27,68 @@
   }
 }
 
-/* guardado: corazón relleno en rojo (doble clase: debe ganar también a las
-   variantes de color que aplique quien lo usa, como .detail-fav) */
+/* variante con etiqueta (Detail): píldora con icono + texto, se lee como
+   acción clara en vez de un corazón suelto */
+.favorite-button.favorite-button--label {
+  width: auto;
+  height: auto;
+  padding: 9px 16px;
+  border-radius: 999px;
+  gap: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--accent-border);
+}
+
+.favorite-button.favorite-button--label:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 14px -3px var(--neon-magenta),
+    0 0 20px -7px var(--neon-cian);
+}
+
+/* ya guardado: borde de acento sólido, para que el estado activo se note */
+.favorite-button.favorite-button--label.favorite-button--on {
+  border-color: var(--accent);
+}
+
+.favorite-button-label {
+  white-space: nowrap;
+}
+
+/* guardado: corazón relleno en magenta neón con resplandor (doble clase:
+   debe ganar también a las variantes de color que aplique quien lo usa,
+   como .detail-fav) */
 .favorite-button.favorite-button--on {
-  color: #e5484d;
+  color: var(--neon-magenta);
+}
+
+/* al activarse: latido (doble pulso) + glow magenta/cian alrededor del icono */
+.favorite-button.favorite-button--on svg {
+  animation: heart-beat 0.5s ease;
+  filter:
+    drop-shadow(0 0 5px var(--neon-magenta))
+    drop-shadow(0 0 9px rgba(24, 224, 255, 0.7));
+}
+
+@keyframes heart-beat {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(0.82);
+  }
+  45% {
+    transform: scale(1.4);
+  }
+  65% {
+    transform: scale(0.92);
+  }
+  82% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

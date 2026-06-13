@@ -1,0 +1,90 @@
+/* Píldora glass del buscador */
+.searchbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(560px, calc(100% - 32px));
+  margin: 14px auto 4px;
+  padding: 11px 16px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  /* fondo glass translúcido + desenfoque */
+  background: var(--social-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* al enfocar el input interno, la píldora entera se ilumina en neón */
+.searchbar:focus-within {
+  border-color: var(--accent-border);
+  box-shadow:
+    0 0 0 1px var(--accent-border),
+    0 0 18px -3px var(--neon-magenta),
+    0 0 24px -7px var(--neon-cian);
+}
+
+.searchbar-icon {
+  flex-shrink: 0;
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.searchbar:focus-within .searchbar-icon {
+  color: var(--accent);
+}
+
+.searchbar-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: 16px; /* >=16px evita el zoom automático de iOS al enfocar */
+  color: var(--text-h);
+}
+
+.searchbar-input::placeholder {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+/* quita la ✕ nativa del type="search" (usamos la nuestra) */
+.searchbar-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* botón de borrar */
+.searchbar-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-size: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--accent-bg);
+  border: 1px solid transparent;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.searchbar-clear:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.searchbar-clear:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -37,7 +37,10 @@ const CardNav = ({
   buttonBgColor,
   buttonTextColor,
   ctaLabel,
-  onCtaClick
+  ctaIcon,
+  onCtaClick,
+  onLogoClick,
+  topRightExtra
 }) => {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -91,11 +94,11 @@ const CardNav = ({
 
     tl.to(navEl, {
       height: calculateHeight,
-      duration: 0.4,
+      duration: 0.28,
       ease
     });
 
-    tl.to(cardsRef.current, { y: 0, opacity: 1, duration: 0.4, ease, stagger: 0.08 }, '-=0.1');
+    tl.to(cardsRef.current, { y: 0, opacity: 1, duration: 0.28, ease, stagger: 0.05 }, '-=0.16');
 
     return tl;
   };
@@ -204,21 +207,37 @@ const CardNav = ({
             <div className="hamburger-line" />
           </div>
 
-          <div className="logo-container">
-            {logo && <img src={logo} alt={logoAlt} className="logo" />}
-            {logoText && <span className="logo-text">{logoText}</span>}
-          </div>
-
-          {ctaLabel && (
+          {onLogoClick ? (
             <button
               type="button"
-              className="card-nav-cta-button"
-              style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
-              onClick={onCtaClick}
+              className="logo-container logo-container--button"
+              onClick={onLogoClick}
             >
-              {ctaLabel}
+              {logo && <img src={logo} alt={logoAlt} className="logo" />}
+              {logoText && <span className="logo-text">{logoText}</span>}
             </button>
+          ) : (
+            <div className="logo-container">
+              {logo && <img src={logo} alt={logoAlt} className="logo" />}
+              {logoText && <span className="logo-text">{logoText}</span>}
+            </div>
           )}
+
+          {/* grupo derecho: acciones extra (p. ej. el selector de tema) + CTA */}
+          <div className="card-nav-right">
+            {topRightExtra}
+            {ctaLabel && (
+              <button
+                type="button"
+                className="card-nav-cta-button"
+                style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+                onClick={onCtaClick}
+              >
+                {ctaIcon}
+                {ctaLabel}
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="card-nav-content" aria-hidden={!isExpanded}>

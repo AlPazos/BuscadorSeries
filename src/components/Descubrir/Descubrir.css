@@ -1,0 +1,134 @@
+.descubrir {
+  text-align: left;
+}
+
+/* ---- filas horizontales (estilo Netflix) ---- */
+.fila {
+  margin-bottom: 12px;
+}
+
+.fila-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: var(--text-h);
+}
+
+/* barrita de acento neón antes del título de la fila */
+.fila-titulo::before {
+  content: '';
+  width: 4px;
+  height: 1.1em;
+  border-radius: 2px;
+  background: var(--gradient);
+}
+
+/* el carrusel: contiene el visor y las flechas superpuestas */
+.fila-carrusel {
+  position: relative;
+}
+
+.fila-scroll {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  /* sin scroll de usuario ni scrollbar; el movimiento lo hacen las flechas
+     vía scrollTo/scrollBy (que funcionan aunque overflow sea hidden) */
+  overflow: hidden;
+  scroll-behavior: smooth;
+  /* padding vertical: el recorte de overflow cortaría el hover (la card se
+     eleva + glow); este aire lo evita. El margen lateral negativo compensa. */
+  padding: 22px 4px 22px;
+  margin-inline: -4px;
+}
+
+/* en las filas las cards son de ancho fijo y no encogen; la sinopsis se oculta
+   para que la fila sea compacta y orientada al póster */
+.fila-scroll .card {
+  flex: 0 0 auto;
+  width: 180px;
+}
+
+.fila-scroll .card .card-plot {
+  display: none;
+}
+
+/* en Descubrir ya filtras por tipo con el toggle: la etiqueta Película/Serie
+   en cada card sobra */
+.fila-scroll .card .card-tag {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .fila-scroll .card {
+    width: 150px;
+  }
+}
+
+/* ---- flechas de navegación: BANDA vertical clicable a cada lado ---- */
+.fila-flecha {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+  width: 68px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border: none;
+  cursor: pointer;
+  /* la franja se ilumina al pasar el ratón por la fila (estilo Netflix) */
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.fila-flecha--prev {
+  left: 0;
+  justify-content: flex-start;
+  /* degradado que oscurece hacia el borde para destacar la franja */
+  background: linear-gradient(to right, rgba(8, 4, 20, 0.6), transparent);
+}
+
+.fila-flecha--next {
+  right: 0;
+  justify-content: flex-end;
+  background: linear-gradient(to left, rgba(8, 4, 20, 0.6), transparent);
+}
+
+/* el chevron, limpio (sin chapa ni borde redondeado), centrado en la franja */
+.fila-flecha-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(8, 4, 20, 0.8);
+  transition:
+    text-shadow 0.25s ease,
+    transform 0.2s ease,
+    color 0.25s ease;
+}
+
+.fila-carrusel:hover .fila-flecha,
+.fila-flecha:focus-visible {
+  opacity: 1;
+}
+
+/* al pasar por la franja entera, el chevron reacciona (no hace falta apuntar) */
+.fila-flecha:hover .fila-flecha-icono {
+  transform: scale(1.15);
+  color: #fff;
+  text-shadow:
+    0 0 12px var(--neon-magenta),
+    0 0 18px var(--neon-cian);
+}
+
+/* en táctil (sin hover) las franjas se ven siempre */
+@media (hover: none) {
+  .fila-flecha {
+    opacity: 1;
+  }
+}

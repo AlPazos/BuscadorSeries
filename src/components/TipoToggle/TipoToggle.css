@@ -1,0 +1,52 @@
+/* Toggle Películas / Series ("toolbox") con marca deslizante de gradiente */
+.tipo-toggle {
+  position: relative;
+  display: flex;
+  width: min(280px, 100%);
+  margin: 8px auto 24px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  isolation: isolate; /* la marca queda por debajo de los botones */
+}
+
+.tipo-toggle-opcion {
+  flex: 1 1 0;
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 9px 0;
+  border-radius: 999px;
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.tipo-toggle-opcion.activo {
+  color: #fff;
+}
+
+/* fondo con el gradiente que se desliza bajo la opción activa */
+.tipo-toggle-marca {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: var(--gradient);
+  box-shadow:
+    0 0 16px -4px var(--neon-magenta),
+    0 0 22px -8px var(--neon-cian);
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tipo-toggle-marca.tv {
+  transform: translateX(100%);
+}

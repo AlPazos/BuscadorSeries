@@ -50,7 +50,7 @@ function FormularioLogin({ onClose, onIrARegistro }) {
 
   return (
     <form className="auth-form" onSubmit={manejarSubmit}>
-      <h2 className="auth-titulo">Entrar</h2>
+      <h2 className="auth-titulo neon-text">Entrar</h2>
 
       <label className="auth-campo">
         Email
@@ -119,7 +119,7 @@ function RegistroStepper({ onClose, onIrALogin }) {
 
   return (
     <div className="auth-registro">
-      <h2 className="auth-titulo">Crear cuenta</h2>
+      <h2 className="auth-titulo neon-text">Crear cuenta</h2>
 
       <Stepper
         onStepChange={setPaso}

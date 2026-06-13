@@ -8,7 +8,8 @@ const TMDB_BASE = 'https://api.themoviedb.org/3'
 // proxy reenviaría CUALQUIER ruta con nuestra key: cualquiera podría usar
 // este dominio como proxy gratuito de toda la API de TMDB y quemar la cuota.
 const RUTAS_TMDB = [
-  /^\/trending\/all\/(day|week)$/,
+  /^\/trending\/(all|movie|tv)\/(day|week)$/,
+  /^\/discover\/(movie|tv)$/,
   /^\/search\/multi$/,
   /^\/movie\/\d+$/,
   /^\/tv\/\d+$/,

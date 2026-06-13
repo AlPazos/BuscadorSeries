@@ -6,9 +6,21 @@
 }
 
 .seasons-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0 0 14px;
   font-size: 18px;
   color: var(--text-h);
+}
+
+/* barrita de acento neón antes del título de temporadas */
+.seasons-title::before {
+  content: '';
+  width: 4px;
+  height: 1.1em;
+  border-radius: 2px;
+  background: var(--gradient);
 }
 
 .seasons-list {

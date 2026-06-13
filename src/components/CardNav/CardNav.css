@@ -23,9 +23,13 @@
   height: 60px;
   padding: 0;
   background-color: var(--bg);
-  border: 1px solid var(--border);
+  /* borde + halo neón magenta/cian alrededor de la barra flotante */
+  border: 1px solid var(--accent-border);
   border-radius: 0.75rem;
-  box-shadow: var(--shadow);
+  box-shadow:
+    var(--shadow),
+    0 0 24px -8px var(--neon-magenta),
+    0 0 30px -10px var(--neon-cian);
   position: relative;
   overflow: hidden;
   will-change: height;
@@ -87,35 +91,88 @@
   transform: translate(-50%, -50%);
 }
 
+/* cuando el logo es clicable (abre el buscador): reset de botón */
+.logo-container--button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.logo-container--button:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.logo-container--button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
 .logo {
   height: 28px;
 }
 
-/* nombre de la web junto al logo (añadido sobre el original) */
+/* nombre de la web junto al logo: gradiente neón magenta→cian en movimiento */
 .logo-text {
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.2px;
-  color: var(--text-h);
   white-space: nowrap;
+  background: linear-gradient(
+    100deg,
+    var(--neon-magenta),
+    var(--neon-cian),
+    var(--neon-magenta)
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: neon-flow 6s linear infinite;
+}
+
+/* grupo de acciones a la derecha de la barra (selector de tema + CTA) */
+.card-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
 }
 
 .card-nav-cta-button {
-  background-color: var(--accent);
+  /* CTA con el gradiente de marca y un resplandor neón */
+  background: var(--gradient);
   color: #fff;
   border: none;
   border-radius: calc(0.75rem - 0.35rem);
-  padding: 0 1rem;
+  padding: 0 1.1rem;
   height: 100%;
   font: inherit;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.15s ease;
+  display: inline-flex;
   align-items: center;
+  gap: 7px;
+}
+
+/* icono (login/logout) dentro del CTA */
+.card-nav-cta-button svg {
+  width: 17px;
+  height: 17px;
 }
 
 .card-nav-cta-button:hover {
-  opacity: 0.85;
+  box-shadow:
+    0 0 16px -2px var(--neon-magenta),
+    0 0 22px -6px var(--neon-cian);
+  transform: translateY(-1px);
 }
 
 .card-nav-content {
@@ -143,6 +200,7 @@
   flex: 1 1 0;
   min-width: 0;
   border-radius: calc(0.75rem - 0.2rem);
+  border: 1px solid var(--accent-border);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -150,10 +208,20 @@
   gap: 8px;
   user-select: none;
   text-align: left;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.3s ease;
+}
+
+.nav-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 18px -6px var(--neon-magenta),
+    0 0 24px -8px var(--neon-cian);
 }
 
 .nav-card-label {
-  font-weight: 400;
+  font-weight: 600;
   font-size: 22px;
   letter-spacing: -0.5px;
 }
@@ -205,6 +273,11 @@
     position: static;
     transform: none;
     order: 1;
+  }
+
+  /* en móvil el logo no está centrado en absoluto: el hover solo escala */
+  .logo-container--button:hover {
+    transform: scale(1.05);
   }
 
   .card-nav-cta-button {

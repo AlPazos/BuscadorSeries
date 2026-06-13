@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Card from '../Card/Card.jsx'
+import TipoToggle from '../TipoToggle/TipoToggle.jsx'
 import { TmdbApi } from '../../api/TmdbApi.js'
 import { useFavoritos } from '../../favoritos/FavoritosContext.jsx'
 import './Favorites.css'
@@ -34,6 +35,7 @@ const pedirTitle = (favorito) => {
 function Favorites({ onSelect }) {
   const { favoritos, cargado, errorCarga, reintentarCarga, esFavorito } = useFavoritos()
   const [titles, setTitles] = useState(null) // null = cargando todavía
+  const [tipo, setTipo] = useState('movie') // 'movie' | 'tv' (toggle)
 
   useEffect(() => {
     // hasta que la lista de favoritos no haya llegado de la API no se pide
@@ -76,14 +78,27 @@ function Favorites({ onSelect }) {
     )
   }
 
+  // el toggle Películas/Series filtra lo que se muestra
+  const mostrados = visibles.filter((t) =>
+    tipo === 'movie' ? t.type === 'movie' : t.type === 'tv',
+  )
+
   return (
     <>
-      <h2 className="favorites-titulo">Mis favoritos</h2>
-      <div className="cards-grid">
-        {visibles.map((t) => (
-          <Card key={`${t.type}-${t.id}`} title={t} onClick={onSelect} />
-        ))}
-      </div>
+      <h2 className="favorites-titulo neon-text">Mis favoritos</h2>
+      <TipoToggle valor={tipo} onCambiar={setTipo} />
+
+      {mostrados.length === 0 ? (
+        <p className="favorites-aviso">
+          No tienes {tipo === 'movie' ? 'películas' : 'series'} en favoritos.
+        </p>
+      ) : (
+        <div className="cards-grid">
+          {mostrados.map((t, i) => (
+            <Card key={`${t.type}-${t.id}`} title={t} index={i} onClick={onSelect} />
+          ))}
+        </div>
+      )}
     </>
   )
 }

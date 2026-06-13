@@ -1,18 +1,50 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+/*
+ * Sistema de color del rediseño «synthwave»: magenta + cian neón.
+ *
+ * Dos colores de marca crudos, iguales en ambos temas, pensados para los
+ * brillos/gradientes neón:
+ *   --neon-magenta / --neon-cian
+ * y un gradiente de marca listo para usar (--gradient).
+ *
+ * El resto de variables (--accent, --bg, --text...) cambian según el tema.
+ * Tema:
+ *   - Por defecto sigue al sistema (prefers-color-scheme), sin JS.
+ *   - Se puede forzar con [data-theme="light"|"dark"] en <html> para el
+ *     futuro selector de tema (override que gana al sistema).
+ */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+:root {
+  /* Colores de marca neón (constantes, para glows y gradientes) */
+  --neon-magenta: #ff2ec4;
+  --neon-cian: #18e0ff;
+  --gradient: linear-gradient(115deg, var(--neon-magenta), var(--neon-cian));
+
+  /* ---- Tema claro (por defecto) ---- */
+  --text: #564f6b;
+  --text-h: #15101f;
+  --bg: #fbf9ff;
+  --border: #e9e4f5;
+  --code-bg: #f3f0fb;
+
+  /* Acentos derivados: magenta como primario, cian como secundario.
+     En claro van algo más profundos para que contrasten sobre fondo claro. */
+  --magenta: #d6189f;
+  --cian: #0a9fc4;
+  --accent: var(--magenta);
+  --accent-2: var(--cian);
+  --accent-bg: rgba(214, 24, 159, 0.08);
+  --accent-border: rgba(214, 24, 159, 0.45);
+  --social-bg: rgba(243, 240, 251, 0.6);
+
+  --shadow:
+    rgba(124, 18, 120, 0.1) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Resplandor neón reutilizable (para hover/activos) */
+  --glow-magenta: 0 0 18px rgba(255, 46, 196, 0.55);
+  --glow-cian: 0 0 18px rgba(24, 224, 255, 0.55);
+
+  --sans: 'Space Grotesk', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Space Grotesk', system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
@@ -30,41 +62,129 @@
   }
 }
 
+/* ---- Tema oscuro ----
+   Se aplica si el sistema está en oscuro (salvo que se fuerce el claro),
+   o si se fuerza explícitamente con data-theme="dark". */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+  :root:not([data-theme='light']) {
+    --text: #b7b0d6;
+    --text-h: #f5f1ff;
+    --bg: #0c0a18;
+    --border: #2a2747;
+    --code-bg: #15122a;
 
+    --magenta: #ff39e6;
+    --cian: #25e3ff;
+    --accent: var(--magenta);
+    --accent-2: var(--cian);
+    --accent-bg: rgba(255, 57, 230, 0.14);
+    --accent-border: rgba(255, 57, 230, 0.55);
+    --social-bg: rgba(255, 255, 255, 0.04);
+
+    --shadow:
+      rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+    --glow-magenta: 0 0 22px rgba(255, 57, 230, 0.6);
+    --glow-cian: 0 0 22px rgba(37, 227, 255, 0.6);
+  }
+}
+
+:root[data-theme='dark'] {
+  --text: #b7b0d6;
+  --text-h: #f5f1ff;
+  --bg: #0c0a18;
+  --border: #2a2747;
+  --code-bg: #15122a;
+
+  --magenta: #ff39e6;
+  --cian: #25e3ff;
+  --accent: var(--magenta);
+  --accent-2: var(--cian);
+  --accent-bg: rgba(255, 57, 230, 0.14);
+  --accent-border: rgba(255, 57, 230, 0.55);
+  --social-bg: rgba(255, 255, 255, 0.04);
+
+  --shadow:
+    rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+  --glow-magenta: 0 0 22px rgba(255, 57, 230, 0.6);
+  --glow-cian: 0 0 22px rgba(37, 227, 255, 0.6);
 }
 
 body {
   margin: 0;
+  /* Resplandor neón muy tenue, fijo al viewport, para el ambiente synthwave */
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(
+      60% 50% at 15% 0%,
+      rgba(255, 46, 196, 0.08),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 50% at 95% 10%,
+      rgba(24, 224, 255, 0.08),
+      transparent 70%
+    );
+  background-repeat: no-repeat;
+  /* el resplandor deriva lentamente para que el neón se sienta "vivo" */
+  background-size: 200% 200%;
+  animation: glow-drift 22s ease-in-out infinite alternate;
+  /* Transición suave al alternar tema claro/oscuro */
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
+}
+
+@keyframes glow-drift {
+  from {
+    background-position:
+      0% 0%,
+      100% 0%;
+  }
+  to {
+    background-position:
+      30% 20%,
+      70% 30%;
+  }
+}
+
+/* Texto con gradiente neón magenta→cian en movimiento, para titulares.
+   Reutilizable: añade la clase .neon-text a un h1/h2/span. */
+.neon-text {
+  background: linear-gradient(
+    100deg,
+    var(--neon-magenta),
+    var(--neon-cian),
+    var(--neon-magenta)
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: neon-flow 6s linear infinite;
+}
+
+@keyframes neon-flow {
+  to {
+    background-position: 220% center;
+  }
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  /* Ancho completo con márgenes laterales (gutters) que crecen con la ventana */
+  padding-inline: clamp(20px, 4vw, 64px);
   /* hueco para el CardNav, que flota sobre la página (top 2em + 60px de barra) */
   padding-top: 104px;
 
   @media (max-width: 768px) {
+    padding-inline: 16px;
     padding-top: 88px;
   }
 }
@@ -72,13 +192,17 @@ body {
 h1,
 h2 {
   font-family: var(--heading);
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-h);
 }
 
 h1 {
   font-size: 56px;
-  letter-spacing: -1.68px;
+  /* line-height propio: el heredado del :root (145% ya resuelto a ~26px) es
+     menor que el tamaño del h1 y recortaba tildes y colas (p, y), sobre todo
+     con el recorte del gradiente de texto */
+  line-height: 1.12;
+  letter-spacing: -1.6px;
   margin: 32px 0;
   @media (max-width: 1024px) {
     font-size: 36px;
@@ -96,5 +220,19 @@ h2 {
 }
 p {
   margin: 0;
+}
+
+/* Accesibilidad: si el usuario pide reducir movimiento, neutralizamos las
+   animaciones y el desplazamiento brusco en toda la app (el catálogo, los
+   corazones, los glows, las transiciones de vista...). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

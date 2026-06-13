@@ -1,11 +1,46 @@
-import { memo } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import FavoriteButton from '../FavoriteButton/FavoriteButton.jsx'
 import './Card.css'
+
+// etiqueta legible del tipo de title (TMDB usa movie/tv)
+const TIPO_ETIQUETA = { movie: 'Película', tv: 'Serie' }
 
 // Recibe un `title` normalizado por TmdbApi y muestra toda su info.
 // Forma esperada: { id, type, title, originalTitle, year, image, rating, votes, plot }
 // `onClick` (opcional) recibe el title al hacer clic en la card.
-function Card({ title, onClick }) {
+// `index` (opcional) escalona la animación de entrada de cada tarjeta.
+function Card({ title, onClick, index = 0 }) {
+  // Animación de entrada: la tarjeta arranca oculta y se revela (fundido +
+  // deslizamiento) cuando entra en el viewport. Un IntersectionObserver por
+  // tarjeta que se desconecta tras revelarse. Respeta prefers-reduced-motion.
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const sinMovimiento = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+    if (sinMovimiento) {
+      el.classList.add('is-visible')
+      return
+    }
+
+    const io = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) {
+            el.classList.add('is-visible')
+            io.unobserve(el)
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   if (!title) return null
 
   const {
@@ -21,8 +56,12 @@ function Card({ title, onClick }) {
 
   return (
     <article
+      ref={ref}
       className={`card${onClick ? ' card--clickable' : ''}`}
       onClick={onClick ? () => onClick(title) : undefined}
+      // escalonado acotado (patrón de 5) para que las tarjetas profundas
+      // no acumulen retardo al revelarse
+      style={{ '--d': `${(index % 5) * 60}ms` }}
     >
       {image ? (
         <div className="card-image">
@@ -46,7 +85,7 @@ function Card({ title, onClick }) {
         )}
 
         <div className="card-meta">
-          {type && <span className="card-tag">{type}</span>}
+          {type && <span className="card-tag">{TIPO_ETIQUETA[type] ?? type}</span>}
           {rating != null && (
             <span className="card-rating">
               ⭐ {rating}

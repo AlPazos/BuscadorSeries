@@ -19,7 +19,7 @@
 }
 
 .scroll-list::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: var(--accent-border);
   border-radius: 4px;
 }
 

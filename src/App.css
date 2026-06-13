@@ -1,18 +1,35 @@
-/* Buscador */
-.search-input {
-  padding: 10px 14px;
-  margin: 10px auto;
-  width: min(480px, calc(100% - 40px));
-  box-sizing: border-box;
-  font-size: 16px; /* >=16px evita el zoom automático de iOS al enfocar */
-  color: var(--text-h);
-  background: var(--social-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+/* Título de cada vista (Buscador / Descubrir), con el gradiente neón */
+.vista-titulo {
+  margin: 6px 0 18px;
+  font-size: clamp(30px, 5vw, 42px);
+  line-height: 1.12;
+  text-align: center;
+}
 
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+/* gradiente neón en cada letra del título (BlurText parte el texto en spans;
+   en una sola palabra el gradiente queda continuo) */
+.vista-titulo .blur-text__segment {
+  background: linear-gradient(120deg, var(--neon-magenta), var(--neon-cian));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Contenedor de la vista activa: se anima al cambiar entre Explorar y
+   Mis favoritos (su `key` cambia y React lo remonta) */
+.vista {
+  animation: vista-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes vista-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

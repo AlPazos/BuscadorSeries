@@ -1,0 +1,103 @@
+/* Capa que cubre la pantalla y centra el diálogo (por encima de todo) */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: rgba(8, 4, 20, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: confirm-overlay-in 0.2s ease;
+}
+
+.confirm-modal {
+  box-sizing: border-box;
+  width: min(380px, 100%);
+  text-align: center;
+  padding: 26px 26px 22px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    var(--shadow),
+    0 0 30px -8px var(--neon-magenta),
+    0 0 40px -12px var(--neon-cian);
+  animation: confirm-modal-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes confirm-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confirm-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirm-titulo {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.confirm-mensaje {
+  margin: 0 0 22px;
+  color: var(--text);
+}
+
+.confirm-acciones {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.confirm-acciones button {
+  flex: 1 1 0;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.15s ease,
+    border-color 0.25s ease;
+}
+
+/* cancelar: botón fantasma */
+.confirm-cancelar {
+  color: var(--text-h);
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+}
+
+.confirm-cancelar:hover {
+  border-color: var(--accent-border);
+}
+
+/* confirmar: gradiente de marca + brillo neón */
+.confirm-confirmar {
+  color: #fff;
+  background: var(--gradient);
+  border: none;
+}
+
+.confirm-confirmar:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 16px -2px var(--neon-magenta),
+    0 0 22px -6px var(--neon-cian);
+}
