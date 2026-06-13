@@ -29,3 +29,7 @@ dist-ssr
 
 # estado local de wrangler (Cloudflare)
 .wrangler
+
+# symlink local al contexto compartido con el backend (vive en ~/.claude,
+# fuera del repo; lo enlazamos para que los agentes lo lean, no se commitea)
+contexto-backend.md

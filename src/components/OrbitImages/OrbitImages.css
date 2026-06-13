@@ -1,0 +1,81 @@
+/* ángulo animado de la órbita (registrado para poder animarlo) */
+@property --orbit-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@keyframes orbit-rot {
+  to {
+    --orbit-angle: 360deg;
+  }
+}
+
+.orbit {
+  /* tamaño base: TODO (radios, pósters, texto, alto) se deriva de aquí, así
+     escala de forma proporcional y responsive a cualquier ancho disponible */
+  --s: min(88vw, 540px);
+  position: relative;
+  width: var(--s);
+  height: calc(var(--s) * 0.66);
+  margin: 4px auto 0;
+  /* radios de la elipse (rx > ry); animar --orbit-angle hace girar los
+     pósters, que se posicionan con cos()/sin() */
+  --rx: calc(var(--s) * 0.4);
+  --ry: calc(var(--s) * 0.21);
+  animation: orbit-rot 28s linear infinite;
+  /* oculto hasta que TODAS las imágenes han cargado (no se ve el texto solo) */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.orbit--listo {
+  opacity: 1;
+}
+
+/* texto central */
+.orbit-centro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.orbit-texto {
+  max-width: calc(var(--s) * 0.42);
+  margin: 0;
+  text-align: center;
+  font-size: clamp(18px, calc(var(--s) * 0.062), 30px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* cada póster en la elipse; --base es su ángulo de partida (inline) */
+.orbit-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--s) * 0.135);
+  transform: translate(-50%, -50%)
+    translate(
+      calc(cos(var(--orbit-angle) + var(--base)) * var(--rx)),
+      calc(sin(var(--orbit-angle) + var(--base)) * var(--ry))
+    );
+  /* profundidad falsa: los de abajo (más cerca) algo más opacos */
+  opacity: calc(0.55 + (sin(var(--orbit-angle) + var(--base)) + 1) / 2 * 0.45);
+}
+
+.orbit-item img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    var(--shadow),
+    0 0 16px -6px var(--neon-magenta);
+}

@@ -1,35 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useTheme } from '../../theme/ThemeContext.jsx'
 import './ThemeToggle.css'
 
-// Lee el tema inicial: 1) el que un script en index.html ya fijó en <html>
-// para evitar el parpadeo (FOUC), 2) lo guardado en localStorage, o 3) la
-// preferencia del sistema. Devuelve siempre 'light' o 'dark'.
-function leerTemaInicial() {
-  const enHtml = document.documentElement.dataset.theme
-  if (enHtml === 'light' || enHtml === 'dark') return enHtml
-
-  const guardado = localStorage.getItem('tema')
-  if (guardado === 'light' || guardado === 'dark') return guardado
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
-}
-
-// Selector de tema claro/oscuro. Fija data-theme en <html> (que el CSS usa
-// como override del prefers-color-scheme) y lo persiste en localStorage.
-// Nota: de momento NO sincroniza con las preferencias del backend; eso es
-// lógica de cuenta y se hará aparte.
+// Selector de tema claro/oscuro. La lógica (aplicar data-theme, persistir y
+// sincronizar con el backend) vive en ThemeProvider; aquí solo el botón.
 function ThemeToggle() {
-  const [tema, setTema] = useState(leerTemaInicial)
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = tema
-    localStorage.setItem('tema', tema)
-  }, [tema])
-
+  const { tema, alternar } = useTheme()
   const esOscuro = tema === 'dark'
-  const alternar = () => setTema(esOscuro ? 'light' : 'dark')
 
   return (
     <button

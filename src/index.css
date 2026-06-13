@@ -39,9 +39,16 @@
   --shadow:
     rgba(124, 18, 120, 0.1) 0 10px 15px -3px,
     rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* sombra de elevación (hover de cards, pósters): suave en claro */
+  --shadow-elev: 0 14px 30px -10px rgba(124, 18, 120, 0.22);
   /* Resplandor neón reutilizable (para hover/activos) */
   --glow-magenta: 0 0 18px rgba(255, 46, 196, 0.55);
   --glow-cian: 0 0 18px rgba(24, 224, 255, 0.55);
+  /* lavado de color del fondo: en claro, marcado para que no quede plano */
+  --wash:
+    radial-gradient(52% 44% at 8% -8%, rgba(255, 46, 196, 0.2), transparent 60%),
+    radial-gradient(50% 44% at 104% 4%, rgba(20, 200, 255, 0.2), transparent 60%),
+    radial-gradient(72% 56% at 50% 114%, rgba(150, 60, 255, 0.14), transparent 62%);
 
   --sans: 'Space Grotesk', system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: 'Space Grotesk', system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -83,8 +90,13 @@
 
     --shadow:
       rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+    --shadow-elev: 0 14px 30px -10px rgba(0, 0, 0, 0.55);
     --glow-magenta: 0 0 22px rgba(255, 57, 230, 0.6);
     --glow-cian: 0 0 22px rgba(37, 227, 255, 0.6);
+    /* en oscuro el lavado es sutil (el neón ya brilla solo sobre negro) */
+    --wash:
+      radial-gradient(60% 50% at 15% 0%, rgba(255, 46, 196, 0.08), transparent 70%),
+      radial-gradient(55% 50% at 95% 10%, rgba(24, 224, 255, 0.08), transparent 70%);
   }
 }
 
@@ -111,19 +123,9 @@
 
 body {
   margin: 0;
-  /* Resplandor neón muy tenue, fijo al viewport, para el ambiente synthwave */
+  /* lavado de color de fondo (var(--wash)): vibrante en claro, sutil en oscuro */
   background-color: var(--bg);
-  background-image:
-    radial-gradient(
-      60% 50% at 15% 0%,
-      rgba(255, 46, 196, 0.08),
-      transparent 70%
-    ),
-    radial-gradient(
-      55% 50% at 95% 10%,
-      rgba(24, 224, 255, 0.08),
-      transparent 70%
-    );
+  background-image: var(--wash);
   background-repeat: no-repeat;
   /* el resplandor deriva lentamente para que el neón se sienta "vivo" */
   background-size: 200% 200%;
@@ -138,12 +140,14 @@ body {
   from {
     background-position:
       0% 0%,
-      100% 0%;
+      100% 0%,
+      50% 100%;
   }
   to {
     background-position:
-      30% 20%,
-      70% 30%;
+      25% 15%,
+      75% 25%,
+      50% 85%;
   }
 }
 

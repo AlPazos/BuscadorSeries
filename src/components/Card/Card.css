@@ -20,7 +20,7 @@
     border-color: var(--accent-border);
     /* resplandor neón magenta + cian alrededor de la tarjeta */
     box-shadow:
-      0 14px 30px -10px rgba(0, 0, 0, 0.5),
+      var(--shadow-elev),
       0 0 0 1px var(--accent-border),
       0 0 22px -4px var(--neon-magenta),
       0 0 30px -6px var(--neon-cian);

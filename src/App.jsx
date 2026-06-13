@@ -6,8 +6,10 @@ import BlurText from './components/BlurText/BlurText.jsx'
 import CardNav from './components/CardNav/CardNav.jsx'
 import ThemeToggle from './components/ThemeToggle/ThemeToggle.jsx'
 import SearchBar from './components/SearchBar/SearchBar.jsx'
+import OrbitImages from './components/OrbitImages/OrbitImages.jsx'
 import AuthModal from './components/AuthModal/AuthModal.jsx'
 import ConfirmDialog from './components/ConfirmDialog/ConfirmDialog.jsx'
+import VideoPlayer from './components/VideoPlayer/VideoPlayer.jsx'
 import { useAuth } from './auth/AuthContext.jsx'
 import { FavoritosProvider, useFavoritos } from './favoritos/FavoritosContext.jsx'
 import Favorites from './components/Favorites/Favorites.jsx'
@@ -189,7 +191,12 @@ function App() {
               placeholder="Busca una película o serie…"
             />
 
-            <Resultados titles={resultados} onSelect={setSelected} />
+            {/* sin texto: orbit decorativo de pósters; con texto: resultados */}
+            {query.trim() ? (
+              <Resultados titles={resultados} onSelect={setSelected} />
+            ) : (
+              <OrbitImages />
+            )}
           </>
         ) : (
           <Descubrir onSelect={setSelected} />
