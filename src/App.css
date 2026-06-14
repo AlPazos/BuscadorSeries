@@ -4,6 +4,13 @@
   font-size: clamp(30px, 5vw, 42px);
   line-height: 1.12;
   text-align: center;
+  /* El fondo Aurora es del mismo magenta/cian que el degradado del título, así
+     que se confundían. Un halo oscuro (uno fino casi de contorno + otro suave)
+     despega las letras del fondo sin perder el degradado. drop-shadow respeta
+     la forma del texto recortado (text-fill-color: transparent). */
+  filter:
+    drop-shadow(0 0 2px rgba(6, 2, 16, 0.85))
+    drop-shadow(0 3px 10px rgba(6, 2, 16, 0.55));
 }
 
 /* gradiente neón en cada letra del título (BlurText parte el texto en spans;

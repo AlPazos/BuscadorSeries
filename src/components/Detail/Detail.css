@@ -55,6 +55,12 @@
   border-radius: 14px 14px 0 0;
   z-index: 0;
   pointer-events: none;
+  /* Disuelve la cabecera a transparente por abajo. Sin esto, el póster
+     difuminado se RECORTA en seco al final del backdrop y deja un canto duro
+     horizontal (la "raya" que se veía a media altura, sobre todo en móvil). La
+     máscara hace que el desenfoque se desvanezca antes del borde, sin canto. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
 }
 
 .detail-backdrop img {
