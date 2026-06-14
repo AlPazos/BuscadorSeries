@@ -202,9 +202,12 @@
 
 /* marco con glow neón alrededor del botón de Google (que no se puede restilizar
    por dentro): así el bloque entero pega con la estética magenta/cian.
-   El borde redondeado (pill) recorta las esquinas del botón de Google. */
+   overflow:hidden recorta el recuadro BLANCO que GIS inyecta por debajo del
+   botón (en producción, con FedCM, sus esquinas cuadradas asoman tras la
+   píldora); al recortarlo, el bloque se ciñe a la forma redondeada. */
 .google-boton-marco {
   border-radius: 999px;
+  overflow: hidden;
   padding: 2px; /* deja ver el glow del marco alrededor del botón */
   background: var(--social-bg);
   box-shadow:
@@ -214,6 +217,13 @@
   transition:
     box-shadow 0.25s ease,
     transform 0.15s ease;
+}
+
+/* el propio botón de GIS, recortado también a la píldora para que su fondo
+   blanco no asome por las esquinas (refuerza el overflow del marco) */
+.google-boton-marco > div,
+.google-boton-marco iframe {
+  border-radius: 999px;
 }
 
 .google-boton-marco:hover {
