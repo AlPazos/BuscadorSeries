@@ -212,6 +212,7 @@ const CardNav = ({
               type="button"
               className="logo-container logo-container--button"
               onClick={onLogoClick}
+              aria-label="Ir a inicio"
             >
               {logo && <img src={logo} alt={logoAlt} className="logo" />}
               {logoText && <span className="logo-text">{logoText}</span>}

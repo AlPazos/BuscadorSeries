@@ -186,6 +186,8 @@ body {
   padding-inline: clamp(20px, 4vw, 64px);
   /* hueco para el CardNav, que flota sobre la página (top 2em + 60px de barra) */
   padding-top: 104px;
+  /* hueco abajo para el Dock flotante de navegación */
+  padding-bottom: 104px;
 
   @media (max-width: 768px) {
     padding-inline: 16px;

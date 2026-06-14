@@ -1,0 +1,111 @@
+.perfil-titulo {
+  margin: 6px 0 18px;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.12;
+  text-align: center;
+}
+
+.perfil-aviso {
+  margin: 48px 20px;
+  color: var(--text);
+}
+
+/* tarjeta central con los datos de la cuenta */
+.perfil-tarjeta {
+  width: min(420px, 100%);
+  margin: 0 auto 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 28px;
+  border-radius: 16px;
+  background: var(--social-bg);
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    var(--shadow),
+    0 0 26px -10px var(--neon-magenta),
+    0 0 32px -12px var(--neon-cian);
+}
+
+/* avatar con la inicial sobre el gradiente de marca */
+.perfil-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  font-size: 38px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gradient);
+  box-shadow:
+    0 0 18px -4px var(--neon-magenta),
+    0 0 24px -8px var(--neon-cian);
+}
+
+.perfil-nombre {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.perfil-datos {
+  width: 100%;
+  margin: 8px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.perfil-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.perfil-dato:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.perfil-dato dt {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.perfil-dato dd {
+  margin: 0;
+  color: var(--text-h);
+}
+
+/* botón de cerrar sesión: borde de acento, fantasma */
+.perfil-salir {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-h);
+  background: var(--social-bg);
+  border: 1px solid var(--accent-border);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.15s ease,
+    color 0.25s ease;
+}
+
+.perfil-salir:hover {
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 14px -3px var(--neon-magenta),
+    0 0 20px -7px var(--neon-cian);
+}

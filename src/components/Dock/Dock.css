@@ -1,0 +1,104 @@
+/* contenedor exterior: fijo, centrado abajo. El alto se anima para que el
+   ítem agrandado (lupa) no se recorte por arriba. */
+.dock-outer {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none; /* solo el panel captura el ratón */
+}
+
+/* el panel glass con los ítems */
+.dock-panel {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 0 14px 8px;
+  border-radius: 18px;
+  box-sizing: border-box;
+  background: var(--social-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    var(--shadow),
+    0 0 22px -8px var(--neon-magenta),
+    0 0 28px -10px var(--neon-cian);
+}
+
+/* cada ítem: círculo glass; el width/height los anima motion (efecto lupa) */
+.dock-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    color 0.25s ease;
+}
+
+.dock-item:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.dock-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ítem de la vista activa: relleno con el gradiente de marca y glow */
+.dock-item--activo {
+  background: var(--gradient);
+  border-color: transparent;
+  color: #fff;
+  box-shadow:
+    0 0 16px -3px var(--neon-magenta),
+    0 0 22px -7px var(--neon-cian);
+}
+
+.dock-item--activo:hover {
+  color: #fff;
+}
+
+.dock-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* etiqueta flotante encima del ítem */
+.dock-label {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(8, 4, 20, 0.85);
+  border: 1px solid var(--accent-border);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}

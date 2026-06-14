@@ -63,6 +63,11 @@ export class UsuariosApi {
     })
   }
 
+  // datos del usuario de la sesión → {id, email, nombre, creadoEn}; 401 sin token
+  getPerfil() {
+    return this.#request('/auth/perfil')
+  }
+
   // --- favoritos (requieren sesión) ---
 
   // → [{id, tmdbId, tipo, anadidoEn}] del usuario, más recientes primero

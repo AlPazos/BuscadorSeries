@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import './App.css'
 import Card from './components/Card/Card.jsx'
@@ -15,6 +15,8 @@ import { useAuth } from './auth/AuthContext.jsx'
 import { FavoritosProvider, useFavoritos } from './favoritos/FavoritosContext.jsx'
 import Favorites from './components/Favorites/Favorites.jsx'
 import Descubrir from './components/Descubrir/Descubrir.jsx'
+import Perfil from './components/Perfil/Perfil.jsx'
+import Dock from './components/Dock/Dock.jsx'
 import { TmdbApi } from './api/TmdbApi.js'
 import { useDebounce } from './hooks/useDebounce.js'
 
@@ -35,6 +37,67 @@ const IconoEntrar = (
     <path d="M15 12H3" />
   </svg>
 )
+
+// iconos del dock de navegación
+const svgProps = {
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 2,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+  'aria-hidden': true,
+}
+const IconoTendencias = (
+  <svg {...svgProps}>
+    <polyline points="3 17 9 11 13 15 21 7" />
+    <polyline points="15 7 21 7 21 13" />
+  </svg>
+)
+const IconoBuscar = (
+  <svg {...svgProps}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </svg>
+)
+const IconoFavoritos = (
+  <svg {...svgProps}>
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+)
+const IconoPerfil = (
+  <svg {...svgProps}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+  </svg>
+)
+
+// Enlaces del menú del CardNav (estáticos: externos). La navegación entre
+// vistas la lleva el Dock; aquí quedan los enlaces externos (y se irán
+// añadiendo más cosas con el tiempo).
+const ITEMS_NAV = [
+  {
+    label: 'El proyecto',
+    bgColor: 'var(--code-bg)',
+    textColor: 'var(--text-h)',
+    links: [
+      { label: 'TMDB', href: 'https://www.themoviedb.org/', target: '_blank' },
+    ],
+  },
+  {
+    label: 'Sígueme',
+    bgColor: 'var(--accent)',
+    textColor: '#fff',
+    links: [
+      { label: 'GitHub', href: 'https://github.com/AlPazos', target: '_blank' },
+      {
+        label: 'LinkedIn',
+        href: 'https://www.linkedin.com/in/alex-pazos/',
+        target: '_blank',
+      },
+    ],
+  },
+]
 
 // Cuadrícula de resultados. Las cards salen en cuanto llegan los títulos de
 // TMDB, sin esperar a la lista de favoritos: es el corazón (FavoriteButton)
@@ -109,48 +172,26 @@ function App() {
   // para vaciar): así al borrar la búsqueda las cards desaparecen al instante
   const resultados = query.trim() ? titles : []
 
-  // Tarjetas del menú del nav; la de "Cuenta" cambia según haya sesión o no.
-  // useMemo: solo se recrean al cambiar la sesión — CardNav reconstruye su
-  // animación cuando le llegan items nuevos, y no debe hacerlo en cada render.
-  const itemsNav = useMemo(() => [
+  // Ítems del Dock (navegación principal). El icono de Favoritos/Perfil abre el
+  // login si no hay sesión, en vez de redirigir en silencio. `active` marca la
+  // vista actual según la ruta.
+  const ruta = location.pathname
+  const dockItems = [
+    { icon: IconoTendencias, label: 'Tendencias', onClick: () => navigate('/'), active: ruta === '/' },
+    { icon: IconoBuscar, label: 'Buscar', onClick: () => navigate('/buscar'), active: ruta === '/buscar' },
     {
-      label: 'Explorar',
-      bgColor: 'var(--code-bg)',
-      textColor: 'var(--text-h)',
-      links: [
-        {
-          label: 'Descubrir',
-          onClick: () => navigate('/'),
-          ariaLabel: 'Ir a Descubrir',
-        },
-        {
-          label: 'Buscar',
-          onClick: () => navigate('/buscar'),
-          ariaLabel: 'Ir a Buscar',
-        },
-        { label: 'TMDB', href: 'https://www.themoviedb.org/', target: '_blank' },
-      ],
+      icon: IconoFavoritos,
+      label: 'Favoritos',
+      onClick: () => (usuario ? navigate('/mis-favoritos') : setModalAuth('login')),
+      active: ruta === '/mis-favoritos',
     },
-    usuario
-      ? {
-          label: 'Cuenta',
-          bgColor: 'var(--accent)',
-          textColor: '#fff',
-          links: [
-            { label: 'Mis favoritos', onClick: () => navigate('/mis-favoritos') },
-            { label: 'Cerrar sesión', onClick: () => setConfirmarSalir(true) },
-          ],
-        }
-      : {
-          label: 'Cuenta',
-          bgColor: 'var(--accent)',
-          textColor: '#fff',
-          links: [
-            { label: 'Entrar', onClick: () => setModalAuth('login') },
-            { label: 'Crear cuenta', onClick: () => setModalAuth('registro') },
-          ],
-        },
-  ], [usuario, navigate])
+    {
+      icon: IconoPerfil,
+      label: 'Perfil',
+      onClick: () => (usuario ? navigate('/perfil') : setModalAuth('login')),
+      active: ruta === '/perfil',
+    },
+  ]
 
   return (
     // El provider vive aquí (y no en main.jsx) porque necesita abrir el modal
@@ -161,11 +202,11 @@ function App() {
         logo="/favicon.png"
         logoAlt="Buscador de películas y series"
         logoText="Buscador"
-        items={itemsNav}
+        items={ITEMS_NAV}
         ctaLabel={usuario ? 'Salir' : 'Entrar'}
         ctaIcon={usuario ? IconoSalir : IconoEntrar}
         onCtaClick={usuario ? () => setConfirmarSalir(true) : () => setModalAuth('login')}
-        onLogoClick={() => navigate('/buscar')}
+        onLogoClick={() => navigate('/')}
         topRightExtra={<ThemeToggle />}
       />
 
@@ -216,6 +257,18 @@ function App() {
             }
           />
 
+          {/* perfil solo con sesión */}
+          <Route
+            path="/perfil"
+            element={
+              usuario ? (
+                <Perfil onSalir={() => setConfirmarSalir(true)} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+
           {/* cualquier otra ruta → Descubrir */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -247,6 +300,9 @@ function App() {
           onCancel={() => setConfirmarSalir(false)}
         />
       )}
+
+      {/* navegación principal: dock flotante abajo */}
+      <Dock items={dockItems} />
 
       {/* atribución requerida por los términos de uso de la API de TMDB */}
       <footer className="tmdb-footer">
