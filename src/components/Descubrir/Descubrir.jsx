@@ -37,25 +37,99 @@ const GENEROS_SERIE = [
 function Fila({ titulo, titles, onSelect }) {
   const scrollRef = useRef(null)
 
-  // mueve el carrusel una "página" (casi el ancho visible). En bucle: al pasar
-  // del final vuelve al principio y al revés. El scroll del usuario está
-  // desactivado por CSS (overflow:hidden), pero scrollTo/scrollBy sí funcionan.
+  // nº de títulos reales (las cards se renderizan 3 veces para el bucle infinito)
+  const n = titles ? titles.length : 0
+
+  // Reposiciona el scroll a la "copia" central. INSTANTÁNEO (behavior:'instant')
+  // a propósito: como las 3 copias son idénticas, saltar un ancho de copia es
+  // invisible y da sensación de carrusel infinito en ambos sentidos. Si no fuera
+  // instantáneo, el scroll-behavior:smooth del CSS animaría el salto y se vería
+  // (era el "comportamiento raro"). El ancho de una copia (setW) se mide en el
+  // DOM (distancia entre la 1ª card de la copia 1 y la de la copia 2), exacta
+  // pese a gaps y padding.
+  const normalizar = () => {
+    const el = scrollRef.current
+    if (!el || n === 0) return
+    const kids = el.children
+    if (kids.length < n + 1) return
+    const setW = kids[n].offsetLeft - kids[0].offsetLeft
+    if (setW <= 0) return
+    let sl = el.scrollLeft
+    while (sl >= 2 * setW) sl -= setW
+    while (sl < setW) sl += setW
+    if (Math.abs(sl - el.scrollLeft) > 0.5) el.scrollTo({ left: sl, behavior: 'instant' })
+  }
+
+  // posición inicial en la copia central (instantánea, sin animar al cargar)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || n === 0) return
+    const kids = el.children
+    if (kids.length < n + 1) return
+    const setW = kids[n].offsetLeft - kids[0].offsetLeft
+    if (setW > 0) el.scrollTo({ left: setW, behavior: 'instant' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [titles])
+
+  // Inclinación de las cards SEGÚN LA VELOCIDAD Y EL SENTIDO del scroll. Vale
+  // tanto para las flechas (scroll suave programático) como para el ARRASTRE
+  // TÁCTIL en móvil: ambos disparan eventos 'scroll'. Se escribe en la variable
+  // CSS --tilt del contenedor (un único write por evento; las cards la heredan).
+  // Al parar el scroll se endereza (0) y se reposiciona el bucle. El
+  // reposicionado se hace SIEMPRE (aunque haya reduce-motion); la inclinación,
+  // solo si el usuario no pidió reducir movimiento.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const conMovimiento = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const MAX = 7 // grados máximos de inclinación
+    const K = 1.6 // factor px/ms → grados
+    let ultimoSL = el.scrollLeft
+    let ultimoT = performance.now()
+    let pausa = null
+
+    const enderezar = () => {
+      if (conMovimiento) el.style.setProperty('--tilt', '0deg')
+      normalizar()
+      ultimoSL = el.scrollLeft // el salto del reposicionado no cuenta como velocidad
+    }
+
+    const alHacerScroll = () => {
+      const ahora = performance.now()
+      const dt = ahora - ultimoT
+      const dx = el.scrollLeft - ultimoSL
+      ultimoSL = el.scrollLeft
+      ultimoT = ahora
+      // dt acotado: ignora el primer evento tras una pausa larga y el salto
+      // instantáneo del reposicionado (que daría una velocidad falsa enorme)
+      if (conMovimiento && dt > 0 && dt < 200) {
+        const ang = Math.max(-MAX, Math.min(MAX, (dx / dt) * K))
+        el.style.setProperty('--tilt', `${ang.toFixed(2)}deg`)
+      }
+      // respaldo de 'scrollend' (no todos los navegadores lo disparan):
+      // enderezar 140 ms después del último evento de scroll
+      clearTimeout(pausa)
+      pausa = setTimeout(enderezar, 140)
+    }
+
+    el.addEventListener('scroll', alHacerScroll, { passive: true })
+    el.addEventListener('scrollend', enderezar)
+    return () => {
+      el.removeEventListener('scroll', alHacerScroll)
+      el.removeEventListener('scrollend', enderezar)
+      clearTimeout(pausa)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // mover una "página" con las flechas. El scroll suave genera la velocidad que
+  // inclina las cards; normalizar() (vía scrollend/respaldo) cierra el bucle.
   const mover = (dir) => {
     const el = scrollRef.current
     if (!el) return
     const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const comportamiento = suave ? 'smooth' : 'auto'
-    const paso = el.clientWidth * 0.9
-
-    if (dir > 0) {
-      const enElFinal = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2
-      if (enElFinal) el.scrollTo({ left: 0, behavior: comportamiento })
-      else el.scrollBy({ left: paso, behavior: comportamiento })
-    } else {
-      const enElInicio = el.scrollLeft <= 2
-      if (enElInicio) el.scrollTo({ left: el.scrollWidth, behavior: comportamiento })
-      else el.scrollBy({ left: -paso, behavior: comportamiento })
-    }
+    el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: suave ? 'smooth' : 'auto' })
   }
 
   if (!titles || titles.length === 0) return null
@@ -73,9 +147,19 @@ function Fila({ titulo, titles, onSelect }) {
         </button>
 
         <div className="fila-scroll" ref={scrollRef}>
-          {titles.map((t, i) => (
-            <Card key={`${t.type}-${t.id}`} title={t} index={i} onClick={onSelect} />
-          ))}
+          {/* 3 copias para el bucle infinito; normalizar() salta a la central */}
+          {[0, 1, 2].map((copia) =>
+            titles.map((t, i) => (
+              // wrapper para inclinar la card sin pisar sus propias
+              // transformaciones (hover, animación de entrada)
+              <div className="fila-card" key={`${copia}-${t.type}-${t.id}`}>
+                {/* precargadas: visibles ya (sin animación de entrada ni
+                    IntersectionObserver) e imagen eager, para que el scroll del
+                    carrusel no compita con animaciones de entrada ni cargas */}
+                <Card title={t} index={i} onClick={onSelect} animarEntrada={false} />
+              </div>
+            )),
+          )}
         </div>
 
         <button

@@ -58,7 +58,18 @@
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
-  background: var(--bg);
+  /* Fondo de página en :root (html), NO en el body: así la aurora (Aurora,
+     position:fixed, z-index:-1) se pinta por ENCIMA de este fondo y por DEBAJO
+     del contenido. Si el fondo viviera en el body —una caja normal— taparía la
+     aurora. El --wash (lavado neón) y su animación se mueven aquí igual. */
+  background-color: var(--bg);
+  background-image: var(--wash);
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+  animation: glow-drift 22s ease-in-out infinite alternate;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -123,17 +134,10 @@
 
 body {
   margin: 0;
-  /* lavado de color de fondo (var(--wash)): vibrante en claro, sutil en oscuro */
-  background-color: var(--bg);
-  background-image: var(--wash);
-  background-repeat: no-repeat;
-  /* el resplandor deriva lentamente para que el neón se sienta "vivo" */
-  background-size: 200% 200%;
-  animation: glow-drift 22s ease-in-out infinite alternate;
-  /* Transición suave al alternar tema claro/oscuro */
-  transition:
-    background-color 0.35s ease,
-    color 0.35s ease;
+  /* El body queda TRANSPARENTE a propósito: el fondo de página vive en :root
+     (html) para que la aurora (z-index:-1) sea visible por debajo del
+     contenido. Ver la nota en :root. */
+  background: transparent;
 }
 
 @keyframes glow-drift {

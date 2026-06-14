@@ -13,7 +13,11 @@
     box-shadow 0.3s ease,
     transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 0.3s ease;
-  will-change: transform;
+  /* OJO: nada de `will-change: transform` aquí. En Descubrir hay ~540 cards
+     (9 filas × 20 ítems × 3 copias del carrusel) y un will-change permanente
+     promociona CADA una a su propia capa de compositor → muchísima memoria de
+     GPU y tirones al hacer scroll. El navegador ya promociona la card sola
+     durante el hover; no hace falta forzarlo. */
 
   &:hover {
     transform: translateY(-8px) scale(1.025);
@@ -47,6 +51,11 @@
   opacity: 1;
   animation: card-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
   animation-delay: var(--d, 0ms);
+}
+
+/* mostrada al instante, sin animación de entrada (modo precargado de Descubrir) */
+.card.is-shown {
+  opacity: 1;
 }
 
 @keyframes card-in {

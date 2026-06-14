@@ -44,6 +44,34 @@
   margin-inline: -4px;
 }
 
+/* En táctil (móvil/tablet) se puede ARRASTRAR entre las cards con el dedo
+   (scroll nativo con inercia); en escritorio se queda en overflow:hidden y solo
+   se navega con las flechas. El bucle infinito sigue funcionando porque
+   'scrollend' también se dispara tras el arrastre y reposiciona la copia. */
+@media (hover: none) and (pointer: coarse) {
+  .fila-scroll {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox: oculta la barra */
+  }
+  .fila-scroll::-webkit-scrollbar {
+    display: none; /* WebKit/Blink: oculta la barra */
+  }
+}
+
+/* wrapper de cada card: es el ítem flex de la fila. Es flex a su vez (con
+   align-items por defecto = stretch) para que la card de dentro siga igualando
+   la altura del resto. Su transform-origin abajo da el "inclinarse" natural.
+   La inclinación se controla con la variable --tilt (la fija el JS según la
+   velocidad y el sentido del scroll, y la pone a 0 al parar); la transición
+   corta hace que siga al movimiento y vuelva suave al enderezarse. */
+.fila-card {
+  display: flex;
+  flex: 0 0 auto;
+  transform-origin: center 80%;
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.2s ease-out;
+}
+
 /* en las filas las cards son de ancho fijo y no encogen; la sinopsis se oculta
    para que la fila sea compacta y orientada al póster */
 .fila-scroll .card {
@@ -126,9 +154,10 @@
     0 0 18px var(--neon-cian);
 }
 
-/* en táctil (sin hover) las franjas se ven siempre */
-@media (hover: none) {
+/* en táctil (móvil/tablet) se navega ARRASTRANDO con el dedo, así que las
+   flechas sobran: se ocultan (mismos dispositivos donde se activa el arrastre) */
+@media (hover: none) and (pointer: coarse) {
   .fila-flecha {
-    opacity: 1;
+    display: none;
   }
 }

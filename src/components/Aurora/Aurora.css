@@ -1,0 +1,37 @@
+/* Contenedor de la aurora: fijo y a pantalla completa, por DETRÁS de todo el
+   contenido (z-index negativo) y sin capturar el ratón. El canvas de la aurora
+   pinta con transparencia, así que el fondo de :root se ve por debajo. */
+.aurora-container {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  /* Intensidad por tema: plena en oscuro, algo más tenue en claro (las bandas
+     neón sobre fondo claro pueden saturar). */
+  opacity: var(--aurora-opacity, 1);
+  transition: opacity 0.35s ease;
+}
+
+.aurora-container canvas {
+  display: block;
+}
+
+/* Tema claro (por defecto y forzado): aurora algo más suave. */
+:root {
+  --aurora-opacity: 0.55;
+}
+:root[data-theme='light'] {
+  --aurora-opacity: 0.55;
+}
+
+/* Tema oscuro (forzado o por sistema): aurora a plena intensidad. */
+:root[data-theme='dark'] {
+  --aurora-opacity: 1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --aurora-opacity: 1;
+  }
+}

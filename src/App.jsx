@@ -18,6 +18,7 @@ import Descubrir from './components/Descubrir/Descubrir.jsx'
 import Perfil from './components/Perfil/Perfil.jsx'
 import Verificar from './components/Verificar/Verificar.jsx'
 import Dock from './components/Dock/Dock.jsx'
+import Aurora from './components/Aurora/Aurora.jsx'
 import { TmdbApi } from './api/TmdbApi.js'
 import { useDebounce } from './hooks/useDebounce.js'
 
@@ -199,6 +200,11 @@ function App() {
     // de login, que es estado de App. Va dentro de AuthProvider, que ya
     // envuelve a App entera, así que useAuth() funciona en su interior.
     <FavoritosProvider alPedirSesion={pedirLogin}>
+      {/* Fondo «Aurora» (React Bits): bandas neón magenta/cian por detrás de
+          todo. Pinta con transparencia, así que se funde con el fondo. La
+          intensidad por tema está en Aurora.css (--aurora-opacity). */}
+      <Aurora colorStops={['#ff2ec4', '#18e0ff', '#9c3cff']} amplitude={1.0} blend={0.5} speed={0.5} />
+
       <CardNav
         logo="/favicon.png"
         logoAlt="Buscador de películas y series"
