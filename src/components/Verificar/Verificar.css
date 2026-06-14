@@ -1,0 +1,80 @@
+.verificar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0 48px;
+}
+
+/* tarjeta central con el resultado de la verificación */
+.verificar-tarjeta {
+  width: min(440px, 100%);
+  box-sizing: border-box;
+  margin: 24px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 36px 28px;
+  border-radius: 16px;
+  background: var(--social-bg);
+  border: 1px solid var(--accent-border);
+  box-shadow:
+    var(--shadow),
+    0 0 26px -10px var(--neon-magenta),
+    0 0 32px -12px var(--neon-cian);
+}
+
+/* círculo con el símbolo de estado (✓ / !) */
+.verificar-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  font-size: 38px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gradient);
+  box-shadow:
+    0 0 18px -4px var(--neon-magenta),
+    0 0 24px -8px var(--neon-cian);
+}
+
+.verificar-icono--error {
+  background: #e5484d;
+  box-shadow: 0 0 18px -4px rgba(229, 72, 77, 0.7);
+}
+
+.verificar-tarjeta .vista-titulo {
+  margin: 0;
+}
+
+.verificar-texto {
+  margin: 0;
+  text-align: center;
+  color: var(--text);
+}
+
+/* CTA con el gradiente de marca */
+.verificar-cta {
+  margin-top: 4px;
+  padding: 11px 24px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--gradient);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 0 16px -2px var(--neon-magenta),
+      0 0 22px -6px var(--neon-cian);
+  }
+}

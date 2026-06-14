@@ -16,6 +16,7 @@ import { FavoritosProvider, useFavoritos } from './favoritos/FavoritosContext.js
 import Favorites from './components/Favorites/Favorites.jsx'
 import Descubrir from './components/Descubrir/Descubrir.jsx'
 import Perfil from './components/Perfil/Perfil.jsx'
+import Verificar from './components/Verificar/Verificar.jsx'
 import Dock from './components/Dock/Dock.jsx'
 import { TmdbApi } from './api/TmdbApi.js'
 import { useDebounce } from './hooks/useDebounce.js'
@@ -268,6 +269,10 @@ function App() {
               )
             }
           />
+
+          {/* verificación de email (pública): /verificar?token=...
+              onEntrar abre el modal de login (estado de App) tras verificar */}
+          <Route path="/verificar" element={<Verificar onEntrar={pedirLogin} />} />
 
           {/* cualquier otra ruta → Descubrir */}
           <Route path="*" element={<Navigate to="/" replace />} />

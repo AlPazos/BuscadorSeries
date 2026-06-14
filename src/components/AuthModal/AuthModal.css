@@ -189,3 +189,129 @@
 .step-default .auth-campo + .auth-campo {
   margin-top: 10px;
 }
+
+/* --- acceso con Google --- */
+
+/* contenedor del botón oficial de GIS: lo centramos y reservamos su alto para
+   que el modal no “salte” mientras carga el script */
+.google-boton {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* marco con glow neón alrededor del botón de Google (que no se puede restilizar
+   por dentro): así el bloque entero pega con la estética magenta/cian.
+   El borde redondeado (pill) recorta las esquinas del botón de Google. */
+.google-boton-marco {
+  border-radius: 999px;
+  padding: 2px; /* deja ver el glow del marco alrededor del botón */
+  background: var(--social-bg);
+  box-shadow:
+    0 0 0 1px var(--accent-border),
+    0 0 16px -6px var(--neon-magenta),
+    0 0 20px -8px var(--neon-cian);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+}
+
+.google-boton-marco:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--accent-border),
+    0 0 18px -3px var(--neon-magenta),
+    0 0 24px -6px var(--neon-cian);
+}
+
+/* separador "o" entre Google y el formulario: línea con la palabra en medio */
+.auth-separador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+}
+
+/* --- verificación de email --- */
+
+/* banner del login 403 (email sin verificar) */
+.auth-verifica {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+}
+
+.auth-verifica .auth-aviso {
+  margin: 0;
+}
+
+/* botón fantasma para reenviar el correo */
+.auth-reenviar {
+  align-self: center;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      0 0 14px -3px var(--neon-magenta),
+      0 0 18px -6px var(--neon-cian);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: progress;
+  }
+}
+
+/* pantalla "revisa tu correo" tras registrarse */
+.auth-revisa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.auth-revisa-icono {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.auth-revisa .auth-titulo {
+  margin: 0;
+}
+
+.auth-revisa-texto {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.auth-revisa-texto strong {
+  color: var(--text-h);
+}

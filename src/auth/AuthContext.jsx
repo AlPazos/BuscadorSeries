@@ -8,6 +8,7 @@
 // cuando el JWT deja de valer (60 min), para no dejar un token muerto.
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { UsuariosApi } from '../api/UsuariosApi.js'
+import { payloadDeJwt } from './jwt.js'
 
 const CLAVE_SESION = 'sesion'
 
@@ -45,16 +46,42 @@ export function AuthProvider({ children }) {
     return () => clearTimeout(timer)
   }, [sesion])
 
-  const login = async (email, password) => {
-    const { token, expiraEnSegundos } = await api.login({ email, password })
-    setSesion({ token, email, expiraEn: Date.now() + expiraEnSegundos * 1000 })
+  // arranca la sesión con un JWT nuestro recién emitido (login normal o Google).
+  // El email lo guardamos para mostrarlo en el nav/perfil; si no se conoce, se
+  // saca del claim `upn` del propio token.
+  const iniciarSesion = (token, expiraEnSegundos, email) => {
+    const emailSesion = email ?? payloadDeJwt(token)?.upn ?? null
+    setSesion({
+      token,
+      email: emailSesion,
+      expiraEn: Date.now() + expiraEnSegundos * 1000,
+    })
   }
 
-  // crea la cuenta y entra directamente con ella (sin segundo formulario)
+  const login = async (email, password) => {
+    const { token, expiraEnSegundos } = await api.login({ email, password })
+    iniciarSesion(token, expiraEnSegundos, email)
+  }
+
+  // login social: canjea el ID token de Google por nuestro JWT (misma respuesta
+  // que /login). El email lo lleva el propio token devuelto (claim `upn`).
+  const loginGoogle = async (idToken) => {
+    const { token, expiraEnSegundos } = await api.loginGoogle(idToken)
+    iniciarSesion(token, expiraEnSegundos)
+  }
+
+  // crea la cuenta pero YA NO entra: ahora hay que verificar el email antes de
+  // poder iniciar sesión (el login devuelve 403 hasta entonces). La UI muestra
+  // la pantalla de "revisa tu correo".
   const registro = async ({ email, password, nombre }) => {
     await api.registro({ email, password, nombre })
-    await login(email, password)
   }
+
+  // reenvía el correo de verificación (responde 200 siempre)
+  const reenviarVerificacion = (email) => api.reenviarVerificacion(email)
+
+  // confirma el email desde la página /verificar (no inicia sesión)
+  const verificarEmail = (token) => api.verificarEmail(token)
 
   const logout = () => setSesion(null)
 
@@ -62,7 +89,10 @@ export function AuthProvider({ children }) {
     usuario: sesion ? { email: sesion.email } : null, // null = nadie dentro
     api, // para favoritos/preferencias: ya lleva el token puesto
     login,
+    loginGoogle,
     registro,
+    reenviarVerificacion,
+    verificarEmail,
     logout,
   }
 

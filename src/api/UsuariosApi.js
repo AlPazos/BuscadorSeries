@@ -55,11 +55,34 @@ export class UsuariosApi {
     })
   }
 
-  // → {token, expiraEnSegundos}; 401 con mensaje genérico si falla
+  // → {token, expiraEnSegundos}; 401 con mensaje genérico si falla;
+  // 403 {error} si el email aún no está verificado (la UI lo distingue por status)
   login({ email, password }) {
     return this.#request('/auth/login', {
       method: 'POST',
       body: { email, password },
+    })
+  }
+
+  // login social: el ID token de Google (Google Identity Services) a cambio de
+  // NUESTRO JWT → {token, expiraEnSegundos}, igual que /login. El backend
+  // verifica el token contra el JWKS de Google y crea/enlaza la cuenta por email.
+  loginGoogle(idToken) {
+    return this.#request('/auth/google', { method: 'POST', body: { idToken } })
+  }
+
+  // confirma el email con el token del enlace del correo → 200 (idempotente).
+  // Es público: no necesita sesión.
+  verificarEmail(token) {
+    return this.#request('/auth/verificar', { method: 'POST', body: { token } })
+  }
+
+  // reenvía el correo de verificación → 200 SIEMPRE (no revela si la cuenta
+  // existe). Público.
+  reenviarVerificacion(email) {
+    return this.#request('/auth/reenviar-verificacion', {
+      method: 'POST',
+      body: { email },
     })
   }
 
