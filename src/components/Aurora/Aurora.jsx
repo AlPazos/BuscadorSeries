@@ -129,10 +129,13 @@ export default function Aurora(props) {
     const ctn = ctnDom.current
     if (!ctn) return
 
+    // ponytail: en móvil abaratamos el shader a pantalla completa (sin MSAA y
+    // limitado a 30fps abajo); el gradiente es lento, no se nota.
+    const movil = window.matchMedia('(max-width: 767px)').matches
     const renderer = new Renderer({
       alpha: true,
       premultipliedAlpha: true,
-      antialias: true,
+      antialias: !movil,
     })
     const gl = renderer.gl
     gl.clearColor(0, 0, 0, 0)
@@ -179,8 +182,12 @@ export default function Aurora(props) {
     ctn.appendChild(gl.canvas)
 
     let animateId = 0
+    const minDt = movil ? 1000 / 30 : 0 // ponytail: 30fps en móvil, libre en escritorio
+    let ultimo = 0
     const update = (t) => {
       animateId = requestAnimationFrame(update)
+      if (t - ultimo < minDt) return
+      ultimo = t
       const { time = t * 0.01, speed = 1.0 } = propsRef.current
       program.uniforms.uTime.value = time * speed * 0.1
       program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0
