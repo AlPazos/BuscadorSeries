@@ -24,6 +24,12 @@ import { useDebounce } from './hooks/useDebounce.js'
 
 const tmdb = new TmdbApi()
 
+// ponytail: Aurora es WebGL con loop rAF continuo a pantalla completa → el mayor
+// coste de GPU en móvil. No la montamos en pantallas pequeñas ni con reduced-motion.
+const fondoPesado =
+  window.matchMedia('(min-width: 768px)').matches &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 // iconos del CTA del nav (salir / entrar)
 const IconoSalir = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -203,7 +209,7 @@ function App() {
       {/* Fondo «Aurora» (React Bits): bandas neón magenta/cian por detrás de
           todo. Pinta con transparencia, así que se funde con el fondo. La
           intensidad por tema está en Aurora.css (--aurora-opacity). */}
-      <Aurora colorStops={['#ff2ec4', '#18e0ff', '#9c3cff']} amplitude={1.0} blend={0.5} speed={0.5} />
+      {fondoPesado && <Aurora colorStops={['#ff2ec4', '#18e0ff', '#9c3cff']} amplitude={1.0} blend={0.5} speed={0.5} />}
 
       <CardNav
         logo="/favicon.png"
