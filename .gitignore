@@ -37,3 +37,7 @@ dist-ssr
 .claude/settings.local.json
 boveda
 opencode.json
+
+# Agentes de IA (no commitear)
+.opencode/
+agents/
