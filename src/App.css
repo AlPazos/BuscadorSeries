@@ -26,6 +26,7 @@
 /* Contenedor de la vista activa: se anima al cambiar entre Explorar y
    Mis favoritos (su `key` cambia y React lo remonta) */
 .vista {
+  padding-top: var(--topnav-height);
   animation: vista-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 

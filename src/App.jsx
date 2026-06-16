@@ -4,7 +4,6 @@ import './App.css'
 import Card from './components/Card/Card.jsx'
 import Detail from './components/Detail/Detail.jsx'
 import BlurText from './components/BlurText/BlurText.jsx'
-import CardNav from './components/CardNav/CardNav.jsx'
 import ThemeToggle from './components/ThemeToggle/ThemeToggle.jsx'
 import SearchBar from './components/SearchBar/SearchBar.jsx'
 import OrbitImages from './components/OrbitImages/OrbitImages.jsx'
@@ -17,8 +16,8 @@ import Favorites from './components/Favorites/Favorites.jsx'
 import Descubrir from './components/Descubrir/Descubrir.jsx'
 import Perfil from './components/Perfil/Perfil.jsx'
 import Verificar from './components/Verificar/Verificar.jsx'
-import Dock from './components/Dock/Dock.jsx'
 import Aurora from './components/Aurora/Aurora.jsx'
+import TopNav from './components/TopNav/TopNav.jsx'
 import { TmdbApi } from './api/TmdbApi.js'
 import { useDebounce } from './hooks/useDebounce.js'
 
@@ -179,26 +178,8 @@ function App() {
   // para vaciar): así al borrar la búsqueda las cards desaparecen al instante
   const resultados = query.trim() ? titles : []
 
-  // Ítems del Dock (navegación principal). El icono de Favoritos/Perfil abre el
-  // login si no hay sesión, en vez de redirigir en silencio. `active` marca la
-  // vista actual según la ruta.
+  // Ruta actual para marcar enlaces activos
   const ruta = location.pathname
-  const dockItems = [
-    { icon: IconoTendencias, label: 'Tendencias', onClick: () => navigate('/'), active: ruta === '/' },
-    { icon: IconoBuscar, label: 'Buscar', onClick: () => navigate('/buscar'), active: ruta === '/buscar' },
-    {
-      icon: IconoFavoritos,
-      label: 'Favoritos',
-      onClick: () => (usuario ? navigate('/mis-favoritos') : setModalAuth('login')),
-      active: ruta === '/mis-favoritos',
-    },
-    {
-      icon: IconoPerfil,
-      label: 'Perfil',
-      onClick: () => (usuario ? navigate('/perfil') : setModalAuth('login')),
-      active: ruta === '/perfil',
-    },
-  ]
 
   return (
     // El provider vive aquí (y no en main.jsx) porque necesita abrir el modal
@@ -210,16 +191,52 @@ function App() {
           intensidad por tema está en Aurora.css (--aurora-opacity). */}
       {mostrarAurora && <Aurora colorStops={['#ff2ec4', '#18e0ff', '#9c3cff']} amplitude={1.0} blend={0.5} speed={0.5} />}
 
-      <CardNav
+      <TopNav
         logo="/favicon.png"
-        logoAlt="Buscador de películas y series"
         logoText="Buscador"
-        items={ITEMS_NAV}
+        items={[
+          {
+            label: 'Tendencias',
+            onClick: () => navigate('/'),
+            active: ruta === '/',
+          },
+          {
+            label: 'Buscar',
+            onClick: () => navigate('/buscar'),
+            active: ruta === '/buscar',
+          },
+          {
+            label: 'Favoritos',
+            onClick: () => (usuario ? navigate('/mis-favoritos') : setModalAuth('login')),
+            active: ruta === '/mis-favoritos',
+          },
+          {
+            label: 'Perfil',
+            onClick: () => (usuario ? navigate('/perfil') : setModalAuth('login')),
+            active: ruta === '/perfil',
+          },
+          {
+            label: 'El proyecto',
+            links: [
+              { label: 'TMDB', href: 'https://www.themoviedb.org/', target: '_blank' }
+            ]
+          },
+          {
+            label: 'Sígueme',
+            links: [
+              { label: 'GitHub', href: 'https://github.com/AlPazos', target: '_blank' },
+              {
+                label: 'LinkedIn',
+                href: 'https://www.linkedin.com/in/alex-pazos/',
+                target: '_blank',
+              },
+            ],
+          },
+        ]}
         ctaLabel={usuario ? 'Salir' : 'Entrar'}
         ctaIcon={usuario ? IconoSalir : IconoEntrar}
         onCtaClick={usuario ? () => setConfirmarSalir(true) : () => setModalAuth('login')}
-        onLogoClick={() => navigate('/')}
-        topRightExtra={<ThemeToggle />}
+        extra={<ThemeToggle />}
       />
 
       {/* el `key` por pathname remonta el contenedor al cambiar de ruta y
@@ -316,9 +333,6 @@ function App() {
           onCancel={() => setConfirmarSalir(false)}
         />
       )}
-
-      {/* navegación principal: dock flotante abajo */}
-      <Dock items={dockItems} />
 
       {/* atribución requerida por los términos de uso de la API de TMDB */}
       <footer className="tmdb-footer">
